@@ -3,13 +3,13 @@ import ReactDOM from 'react-dom/client';
 import BookPage from './BookPage';
 import {Canvas} from "@react-three/fiber";
 import { Text } from '@react-three/drei';
+import './styles.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Canvas
       camera={{ position: [0, 0, 1], fov: 65 }}
-      style={{ width: '100%', height: '100vh' }}
     >
       <ambientLight intensity={Math.PI / 2} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />

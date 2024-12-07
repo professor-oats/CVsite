@@ -12,7 +12,7 @@ const BookPage = ({ position }) => {
   return (
     <animated.mesh ref={ref} position={position} rotation={rotation} scale={[1, 1, 1]}>
       <planeGeometry args={[1, 1.5]} />
-      <meshStandardMaterial color="white" />
+      <meshStandardMaterial color="#fde68a" />
     </animated.mesh>
   );
 };
