@@ -25,7 +25,7 @@ root.render(
       <OrbitControls/>
       <Book/>
       <Text
-        position={[0, 0, 0.2]}
+        position={[0, 0, 0.3]}
         fontSize={0.2}
         color="orange"
         anchorX="center"

@@ -1,8 +1,10 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { animated, useSpring } from '@react-spring/three'; // Will be used futher on
+import MultiplePages from "./PagesMultiple";
 
 const Book = () => {
-  const groupRef = useRef(); // Reference for the entire book
+  const bookRef = useRef(); // Reference for the entire book
   const frontCoverRef = useRef(); // Reference for the front cover
 
   const startingPositionY = useRef(0); // Use a ref to store the initial Y position
@@ -11,19 +13,19 @@ const Book = () => {
   // Rotate the entire book around the Y-axis
   useFrame(() => {
 
-    if (groupRef.current && startingPositionY.current === 0) {
-      startingPositionY.current = groupRef.current.position.y; // Set initial Y position
+    if (bookRef.current && startingPositionY.current === 0) {
+      startingPositionY.current = bookRef.current.position.y; // Set initial Y position
     }
 
-    if (groupRef.current) {
+    if (bookRef.current) {
       if (movingUp.current) {
-        groupRef.current.position.y += 0.0008;
-        if (groupRef.current.position.y >= startingPositionY.current + 0.05) {
+        bookRef.current.position.y += 0.0008;
+        if (bookRef.current.position.y >= startingPositionY.current + 0.05) {
           movingUp.current = false; // Change direction to move down
         }
       } else {
-        groupRef.current.position.y -= 0.0008;
-        if (groupRef.current.position.y <= startingPositionY.current - 0.01) {
+        bookRef.current.position.y -= 0.0008;
+        if (bookRef.current.position.y <= startingPositionY.current - 0.01) {
           movingUp.current = true; // Change direction to move up
         }
       }
@@ -35,25 +37,34 @@ const Book = () => {
     } */
   });
 
+  {/* Unless we want some fancy separate animation for pages
+    * we kind of would chunk pages together with frontCoverRef,
+    * as well as backCoverRef to gain a split in animations
+    * and animate the front part - like opening the cover together with
+    * some pages contrasting from the back page chunk */}
+
   return (
-    <group ref={groupRef}>
+    <group ref={bookRef}>
       {/* Front Cover */}
-      <mesh ref={frontCoverRef} position={[0, 0, 0.1]}>
-        <boxGeometry args={[1.1, 1.5, 0.05]} />
-        <meshStandardMaterial color="#2d194d" />
-      </mesh>
+      <group ref={frontCoverRef}>
+        <mesh position={[0, 0, 0.2]}>
+          <boxGeometry args={[1.1, 1.5, 0.07]}/>
+          <meshStandardMaterial color="#2d194d"/>
+        </mesh>
+        <MultiplePages/>
+      </group>
 
       {/* Back Cover */}
       <mesh position={[0, 0, -0.1]}>
-        <boxGeometry args={[1.1, 1.5, 0.05]} />
+        <boxGeometry args={[1.1, 1.5, 0.05]}/>
         <meshStandardMaterial color="#2d194d" />
       </mesh>
 
-      {/* Pages */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[1.1, 1.5, 0.02]} />
+      {/* Page mesh */}
+      {/*<mesh position={[0, 0, 0]}>
+        <boxGeometry args={[1.1, 1.5, 0.007]} />
         <meshStandardMaterial color="beige" />
-      </mesh>
+      </mesh> */}
     </group>
   );
 };
