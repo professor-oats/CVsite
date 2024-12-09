@@ -6,6 +6,8 @@ import MultiplePages from "./PagesMultiple";
 const Book = () => {
   const bookRef = useRef(); // Reference for the entire book
   const frontCoverRef = useRef(); // Reference for the front cover
+  const backCoverRef = useRef();
+  const centerRef = useRef();
 
   const startingPositionY = useRef(0); // Use a ref to store the initial Y position
   const movingUp = useRef(true); // Track the movement direction
@@ -17,6 +19,7 @@ const Book = () => {
       startingPositionY.current = bookRef.current.position.y; // Set initial Y position
     }
 
+    /* Lerp this? */
     if (bookRef.current) {
       if (movingUp.current) {
         bookRef.current.position.y += 0.0008;
@@ -37,11 +40,16 @@ const Book = () => {
     } */
   });
 
-  {/* Unless we want some fancy separate animation for pages
+  /* Unless we want some fancy separate animation for pages
     * we kind of would chunk pages together with frontCoverRef,
     * as well as backCoverRef to gain a split in animations
     * and animate the front part - like opening the cover together with
-    * some pages contrasting from the back page chunk */}
+    * some pages contrasting from the back page chunk */
+
+  /* Got the front + back cover mesh groups set.
+    * Question is if we would have a center space for the pages
+    * that we want to target our CV render animations on and keep
+    * the front a back mesh groups separated from these animation? */
 
   return (
     <group ref={bookRef}>
@@ -51,14 +59,26 @@ const Book = () => {
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial color="#2d194d"/>
         </mesh>
-        <MultiplePages/>
+        <MultiplePages z_origin={0.075} z_directed={0.015}/>
+      </group>
+
+      {/* This is where the CV render will take place, like have four pages
+        * to flip through with different rendered content
+        * We would have to check so we can index the pages as key to
+        * call specific animation on */}
+
+      <group ref={centerRef}>
+        <MultiplePages amount={4} z_origin={0.06} z_directed={-0.015}/>
       </group>
 
       {/* Back Cover */}
-      <mesh position={[0, 0, -0.1]}>
-        <boxGeometry args={[1.1, 1.5, 0.05]}/>
-        <meshStandardMaterial color="#2d194d" />
-      </mesh>
+      <group ref={backCoverRef}>
+        <mesh position={[0, 0, -0.1]}>
+          <boxGeometry args={[1.1, 1.5, 0.07]}/>
+          <meshStandardMaterial color="#2d194d" />
+          <MultiplePages z_origin={0.115} z_directed={-0.015}/>
+        </mesh>
+      </group>
 
       {/* Page mesh */}
       {/*<mesh position={[0, 0, 0]}>

@@ -1,6 +1,6 @@
-const MultiplePages = () => {
-  const pages = Array.from({ length: 8 }, (_, index) => (
-    <mesh key={index} position={[0, 0, 0.015 + index * 0.015]}>
+const MultiplePages = ({amount = 6, z_origin = 0, z_directed = 0.015}) => {
+  const pages = Array.from({ length: amount }, (_, index) => (
+    <mesh key={index} position={[0, 0, z_origin + index * z_directed]}>
       <boxGeometry args={[1.1, 1.5, 0.003]} />
       <meshStandardMaterial color="beige" />
     </mesh>
