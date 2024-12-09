@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { animated, useSpring } from '@react-spring/three'; // Will be used futher on
 import MultiplePages from "./PagesMultiple";
@@ -8,6 +8,14 @@ const Book = () => {
   const frontCoverRef = useRef(); // Reference for the front cover
   const backCoverRef = useRef();
   const centerRef = useRef();
+  const spineRef = useRef();
+
+  const bookSpring = useSpring({
+    rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
+    config: { duration: 0 }, // Static, no animation
+  });
+
+  const [opened, setOpened] = useState(false);  // Will use this when opening book
 
   const startingPositionY = useRef(0); // Use a ref to store the initial Y position
   const movingUp = useRef(true); // Track the movement direction
@@ -52,7 +60,7 @@ const Book = () => {
     * the front a back mesh groups separated from these animation? */
 
   return (
-    <group ref={bookRef}>
+    <animated.group ref={bookRef} rotation={bookSpring.rotation}>
       {/* Front Cover */}
       <group ref={frontCoverRef}>
         <mesh position={[0, 0, 0.2]}>
@@ -75,17 +83,25 @@ const Book = () => {
       <group ref={backCoverRef}>
         <mesh position={[0, 0, -0.1]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
-          <meshStandardMaterial color="#2d194d" />
+          <meshStandardMaterial color="#2d194d"/>
           <MultiplePages z_origin={0.115} z_directed={-0.015}/>
         </mesh>
       </group>
+
+        {/* spine */}
+      <animated.mesh position={[-0.6, 0, 0]}>
+        <cylinderGeometry
+          args={[0.075, 0.075, 1.5, 32, 1, true, Math.PI, Math.PI]}
+        />
+        <meshStandardMaterial color="#2d194d"/>
+      </animated.mesh>
 
       {/* Page mesh */}
       {/*<mesh position={[0, 0, 0]}>
         <boxGeometry args={[1.1, 1.5, 0.007]} />
         <meshStandardMaterial color="beige" />
       </mesh> */}
-    </group>
+    </animated.group>
   );
 };
 
