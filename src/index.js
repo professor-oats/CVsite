@@ -5,10 +5,12 @@ import {Canvas} from "@react-three/fiber";
 import { Text } from '@react-three/drei';
 import { OrbitControls } from '@react-three/drei';
 import './styles.css'
+import {TextureProvider} from "./TextureContext";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <TextureProvider>
     <Canvas
       camera={{
         position: [0, 0, 4], // Camera position along the z-axis
@@ -33,6 +35,7 @@ root.render(
       >
         Hello Mom!!
       </Text>
-    </Canvas>,
+    </Canvas>
+    </TextureProvider>
   </React.StrictMode>
 );

@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { animated, useSpring } from '@react-spring/three'; // Will be used futher on
 import MultiplePages from "./PagesMultiple";
 import ArcSpine from "./ArcSpine";
+import { useTextures } from './TextureContext';
 
 const Book = () => {
   const bookRef = useRef(); // Reference for the entire book
@@ -10,6 +11,7 @@ const Book = () => {
   const backCoverRef = useRef();
   const centerRef = useRef();
   const spineRef = useRef();
+  const textures = useTextures();
 
   const bookSpring = useSpring({
     rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
@@ -66,7 +68,12 @@ const Book = () => {
       <group ref={frontCoverRef}>
         <mesh position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
-          <meshStandardMaterial color="#2d194d"/>
+          <meshStandardMaterial
+            color="#2d194d"
+            normalMap={textures.normalLeather}
+            diffuseMap={textures.diffuseLeather}
+            roughness={0.4}
+          />
         </mesh>
         <MultiplePages z_origin={0.075} z_directed={0.015}/>
       </group>
@@ -84,7 +91,12 @@ const Book = () => {
       <group ref={backCoverRef}>
         <mesh position={[0, 0, -0.1]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
-          <meshStandardMaterial color="#2d194d"/>
+          <meshStandardMaterial
+            color="#2d194d"
+            normalMap={textures.normalLeather}
+            diffuseMap={textures.diffuseLeather}
+            roughness={0.4}
+          />
           <MultiplePages z_origin={0.115} z_directed={-0.015}/>
         </mesh>
       </group>
