@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { animated, useSpring } from '@react-spring/three'; // Will be used futher on
 import MultiplePages from "./PagesMultiple";
+import ArcSpine from "./ArcSpine";
 
 const Book = () => {
   const bookRef = useRef(); // Reference for the entire book
@@ -89,12 +90,10 @@ const Book = () => {
       </group>
 
         {/* spine */}
-      <animated.mesh position={[-0.6, 0, 0]}>
-        <cylinderGeometry
-          args={[0.075, 0.075, 1.5, 32, 1, true, Math.PI, Math.PI]}
-        />
-        <meshStandardMaterial color="#2d194d"/>
+      <animated.mesh position={[-0.503, -0.75, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ArcSpine/>
       </animated.mesh>
+
 
       {/* Page mesh */}
       {/*<mesh position={[0, 0, 0]}>

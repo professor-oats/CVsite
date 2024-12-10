@@ -11,7 +11,7 @@ root.render(
   <React.StrictMode>
     <Canvas
       camera={{
-        position: [0, 0, 3], // Camera position along the z-axis
+        position: [0, 0, 4], // Camera position along the z-axis
         fov: 55,              // Field of view, adjust for better perspective
         near: 0.1,            // Near clipping plane
         far: 1000,            // Far clipping plane
