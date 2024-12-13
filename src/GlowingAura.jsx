@@ -67,18 +67,20 @@ const AuraGlow = ({ innerRadius, outerRadius }) => {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
+          count={positions.length / 3}  // This is the separator calc to let THREE know
+          // the total length of the Float32Array since we then set the itemSize to 3 when stepping the
+          // data to render on each position in the array buffer with array={positions}
+          array={positions} // This is the actual data array that contains the particle positions.
           itemSize={3}
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.1} // Size of each particle
-        color={new THREE.Color(0x00ff00)}
-        emissive={new THREE.Color(0x00ff00)} // Make emissive for glow
-        emissiveIntensity={1} // Intensity of glow
+        size={0.05} // Size of each particle
+        color={new THREE.Color(0x5887f5)}
+        roughness={0}
+        emissive={new THREE.Color(0x5887f5)} // Make emissive for glow
+        emissiveIntensity={0} // Intensity of glow
         transparent={false} // Set transparency true or false, go with false so far
-        opacity={0.8} // Adjust opacity for better blending
       />
     </points>
   );
