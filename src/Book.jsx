@@ -1,13 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { animated, useSpring } from '@react-spring/three'; // Will be used futher on
 import MultiplePages from "./PagesMultiple";
 import ArcSpine from "./ArcSpine";
 import { useTextures } from './TextureContext';
+import GlowingAura from './GlowingAura';
 
 const Book = () => {
   const bookRef = useRef(); // Reference for the entire book
-  const frontCoverRef = useRef(); // Reference for the front cover
+  const frontCoverGroupRef = useRef(); // Reference for the front cover
+  const frontCoverRef = useRef();
+  const backCoverGroupRef = useRef();
   const backCoverRef = useRef();
   const centerRef = useRef();
   const spineRef = useRef();
@@ -18,14 +21,25 @@ const Book = () => {
     config: { duration: 0 }, // Static, no animation
   });
 
+  // Spring for adding emmisiveness/glow to mesh
+  const emissiveSpring = useSpring({
+    emissiveIntensity: 1.0, // Target emissive intensity
+    from: { emissiveIntensity: 0 }, // Starting emissive intensity
+    config: { duration: 1000 },
+    loop: { reverse: true },
+  });
+
   const [opened, setOpened] = useState(false);  // Will use this when opening book
 
   const startingPositionY = useRef(0); // Use a ref to store the initial Y position
   const movingUp = useRef(true); // Track the movement direction
 
-  // Rotate the entire book around the Y-axis
+
+  // useFrame here for render custom defined springanim properties
+
   useFrame(() => {
 
+    // Rotate the entire book around the Y-axis + X-axis
     if (bookRef.current && startingPositionY.current === 0) {
       startingPositionY.current = bookRef.current.position.y; // Set initial Y position
     }
@@ -62,11 +76,16 @@ const Book = () => {
     * that we want to target our CV render animations on and keep
     * the front a back mesh groups separated from these animation? */
 
+  // Will we have to set a position origin for the animated group perhaps?
+  // kind of abusing that the default position is [0,0,0] here
   return (
     <animated.group ref={bookRef} rotation={bookSpring.rotation}>
+      {/* Adding glow to the group */}
+      <GlowingAura innerRadius={2} outerRadius={4}/>
+
       {/* Front Cover */}
-      <group ref={frontCoverRef}>
-        <mesh position={[0, 0, 0.2]}>
+      <group ref={frontCoverGroupRef}>
+        <mesh ref={frontCoverRef} position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
             color="#2d194d"
@@ -88,8 +107,8 @@ const Book = () => {
       </group>
 
       {/* Back Cover */}
-      <group ref={backCoverRef}>
-        <mesh position={[0, 0, -0.1]}>
+      <group ref={backCoverGroupRef}>
+        <mesh ref={backCoverRef} position={[0, 0, -0.1]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
             color="#2d194d"
@@ -102,9 +121,9 @@ const Book = () => {
       </group>
 
         {/* spine */}
-      <animated.mesh position={[-0.503, -0.75, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[-0.503, -0.75, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
         <ArcSpine/>
-      </animated.mesh>
+      </mesh>
 
 
       {/* Page mesh */}
