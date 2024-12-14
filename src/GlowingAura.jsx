@@ -86,8 +86,6 @@ const AuraGlow = ({ innerRadius, outerRadius }) => {
         size={0.01} // Size of each particle
         color={new THREE.Color(0xffffff)}
         roughness={0}
-        emissive={new THREE.Color(0xffffff)} // Make emissive for glow
-        emissiveIntensity={0} // Intensity of glow
         transparent={false} // Set transparency true or false, go with false so far
       />
     </points>

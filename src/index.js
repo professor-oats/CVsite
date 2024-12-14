@@ -2,13 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Book from './Book';
 import GlowingAura from './GlowingAura';
-import {Canvas, useThree} from "@react-three/fiber";
+import ParticleBeams from './ParticleBeams';
+import { Canvas, useThree } from "@react-three/fiber";
 import { Text } from '@react-three/drei';
 import { OrbitControls } from '@react-three/drei';
 import './styles.css'
-import {TextureProvider} from "./TextureContext";
+import { TextureProvider } from "./TextureContext";
 import { BloomProvider } from './BloomContext';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { animated, useSpring } from "@react-spring/three";
 
 /* Note:
  * Adding bloom effect as a post render to certain elements is a very hacky way
@@ -19,6 +21,18 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
  */
 
 const MainApp = () => {
+
+
+  /* Having a general rotationSpring applied on animated.group in index.js gives less imports necessary
+   * in the jsx files
+   * !!! Thinking of it a second time it may end up in multiple rotation renders so I'd rather use
+   * imports in each JSX file that need them ...
+   */
+  const rotationSpring = useSpring({
+    rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
+    config: { duration: 0 }, // Static, no animation
+  });
+
   return (
     <TextureProvider>
     <Canvas
@@ -44,14 +58,14 @@ const MainApp = () => {
       <BloomProvider>
         <EffectComposer>
           <Bloom
-            intensity={2.0}  // Adjust intensity of the bloom effect
-            width={300}  // Resolution width for bloom
-            height={300} // Resolution height for bloom
-            kernelSize={3} // Bloom size, adjust as needed
+            intensity={4.0}  // Adjust intensity of the bloom effect - - - MAX it baby
+            width={500}  // Resolution width for bloom
+            height={500} // Resolution height for bloom
+            kernelSize={2} // Bloom size, adjust as needed
           />
         </EffectComposer>
-        <GlowingAura innerRadius={2} outerRadius={4}/>
       </BloomProvider>
+      <ParticleBeams innerRadius={1} outerRadius={2}/>
       <Book/>
       <Text
         position={[0, 0, 0.3]}
