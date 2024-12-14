@@ -4,7 +4,6 @@ import { animated, useSpring } from '@react-spring/three'; // Will be used futhe
 import MultiplePages from "./PagesMultiple";
 import ArcSpine from "./ArcSpine";
 import { useTextures } from './TextureContext';
-import GlowingAura from './GlowingAura';
 
 const Book = () => {
   const bookRef = useRef(); // Reference for the entire book
@@ -79,11 +78,11 @@ const Book = () => {
   // Will we have to set a position origin for the animated group perhaps?
   // kind of abusing that the default position is [0,0,0] here
   return (
-    <animated.group ref={bookRef} rotation={bookSpring.rotation}>
+    <animated.group>
       {/* Adding glow to the group */}
-      <GlowingAura innerRadius={2} outerRadius={4}/>
 
       {/* Front Cover */}
+      <animated.group ref={bookRef} rotation={bookSpring.rotation}>
       <group ref={frontCoverGroupRef}>
         <mesh ref={frontCoverRef} position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
@@ -124,6 +123,7 @@ const Book = () => {
       <mesh position={[-0.503, -0.75, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
         <ArcSpine/>
       </mesh>
+      </animated.group>
 
 
       {/* Page mesh */}

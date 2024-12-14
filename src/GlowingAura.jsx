@@ -2,11 +2,19 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+/* Main NOTE: Can we even cost us to go all shaderless for this project?
+ * won't a solid glow anim need some kind of mask to specify the boundaries?
+ */
+
+/* Second NOTE: Unless we find a REALLY good formula to work on the particles we may
+ * just as well use a mask and only render particles inside that boundary
+ */
+
 const AuraGlow = ({ innerRadius, outerRadius }) => {
   const particlesRef = useRef();
   const [positions] = useState(() => {
     const posArray = [];  // Construct an array to hold the particles
-    const particleCount = 500;
+    const particleCount = 1500;
     for (let i = 0; i < particleCount; i++) {
       const radius = THREE.MathUtils.randFloat(innerRadius, outerRadius);  // Set boundaries
       // by defining the min and max values for the randFloat radius in where to push a particle
@@ -24,7 +32,7 @@ const AuraGlow = ({ innerRadius, outerRadius }) => {
   // Create particle velocity to animate their movement
   const [velocities] = useState(() => {
     const velocityArray = [];
-    const particleCount = 500;
+    const particleCount = 1500;
     for (let i = 0; i < particleCount; i++) {
       // Random velocity in each direction (x, y, z)
       velocityArray.push(THREE.MathUtils.randFloat(-0.001, 0.001));
@@ -75,10 +83,10 @@ const AuraGlow = ({ innerRadius, outerRadius }) => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.05} // Size of each particle
-        color={new THREE.Color(0x5887f5)}
+        size={0.01} // Size of each particle
+        color={new THREE.Color(0xffffff)}
         roughness={0}
-        emissive={new THREE.Color(0x5887f5)} // Make emissive for glow
+        emissive={new THREE.Color(0xffffff)} // Make emissive for glow
         emissiveIntensity={0} // Intensity of glow
         transparent={false} // Set transparency true or false, go with false so far
       />
