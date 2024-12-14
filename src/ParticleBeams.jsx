@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { animated, useSpring } from "@react-spring/three";
 
 const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   // Initialize positions and velocities
@@ -10,6 +11,15 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   const positions = new Float32Array(beamCount * particlesPerBeam * 3); // 3 components per particle (x, y, z)
   const velocities = new Float32Array(beamCount * particlesPerBeam * 3);
 
+  const beamSpring = useSpring({
+    rotation: [-Math.PI / 2, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
+    position: [0, 0, 0.3],  // Slight fronting of the anim
+    config: { duration: 0 }, // Static, no animation
+  });
+
+  // NOTE: Currently we have a wider spread of particles at the former frames
+  // and progressively they tighten up. We should check the t and some other things
+
   let index = 0;
   for (let b = 0; b < beamCount; b++) {
     const angle = (b / beamCount) * Math.PI * 2; // Spread beams evenly around the circle
@@ -18,10 +28,13 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
 
     for (let p = 0; p < particlesPerBeam; p++) {
       const t = p / particlesPerBeam; // Progress along the beam (0 to 1)
-      const radius = innerRadius + t * (outerRadius - innerRadius);
+      const radius = innerRadius + t * (outerRadius - innerRadius);  // linear progression
 
-      const offsetX = (Math.random() - 0.5) * 0.1; // Randomness for position
-      const offsetZ = (Math.random() - 0.5) * 0.1;
+      // Seems like this Math.random here can be played with to generate different flow
+      // behaviour - - - default: - 0.5, generally it affects the perceived spread
+      // which is good to know
+      const offsetX = (Math.random() - 0.1) * 0.5; // Randomness for position
+      const offsetZ = (Math.random() - 0.1) * 0.5;
 
       // Set positions - - - Tinker these values to gain the beam look that we want
       // To gain a more authentic glow experience we would like to have a wider spread
@@ -33,7 +46,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       positions[index + 2] = radius * dirZ + offsetZ;   // z
 
       // Set velocities
-      const velocityScale = 0.1;
+      const velocityScale = 2;
       velocities[index] = dirX * velocityScale;   // vx
       velocities[index + 1] = 0;                 // vy
       velocities[index + 2] = dirZ * velocityScale;   // vz
@@ -56,13 +69,15 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       const z = positions[i * 3 + 2];
       const distance = Math.sqrt(x * x + y * y + z * z);
 
-      if (distance > outerRadius) {
+      if (distance > outerRadius * 1.5) {   // Change the value of outer radius for
+        // a delayed reset effect to affect flow -> pulse
         const angle = Math.atan2(z, x);
         const dirX = Math.cos(angle);
         const dirZ = Math.sin(angle);
 
         positions[i * 3] = innerRadius * dirX;
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 0.1; // Reset Y
+        positions[i * 3 + 1] = (Math.random() - 0.5);  // Since resets happen quite frequently
+        // this is the most occurring y pos
         positions[i * 3 + 2] = innerRadius * dirZ;
       }
     }
@@ -74,7 +89,11 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
 
   });
 
+  // Alright, we have out wanted rotation. Now we just have to add a slight position
+  // fronting to the Spring to go better with our scene
+
   return (
+    <animated.group position={beamSpring.position} rotation={beamSpring.rotation}>
     <points ref={particlesRef}>
       <bufferGeometry>
         <bufferAttribute
@@ -87,12 +106,14 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.01} // Size of each particle
-        color={new THREE.Color(0xffffff)}
+        size={0.007} // Size of each particle
+        color={new THREE.Color(0x4aeaff)}  // Blend different colors for fancy light
+        // or crank up the bloom more (god) to gain proper lighting when not using white color?
         roughness={0}
         transparent={false} // Set transparency true or false, go with false so far
       />
     </points>
+    </animated.group>
   );
 };
 
