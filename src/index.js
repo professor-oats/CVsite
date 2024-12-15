@@ -35,48 +35,49 @@ const MainApp = () => {
 
   return (
     <TextureProvider>
-    <Canvas
-      camera={{
-        position: [0, 0, 4],  // Camera position
-        fov: 55,               // Field of view
-        near: 0.1,             // Near clipping plane
-        far: 1000,             // Far clipping plane
-        up: [0, 1, 0],         // Camera up vector
-      }}
-    >
-      {/* Lighting */}
-      <ambientLight intensity={0} />
-      <spotLight position={[5, 5, 5]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
-      <pointLight position={[-5, -5, -5]} decay={0} intensity={Math.PI} />
+      <Canvas
+        camera={{
+          position: [0, 0, 4],  // Camera position
+          fov: 55,               // Field of view
+          near: 0.1,             // Near clipping plane
+          far: 1000,             // Far clipping plane
+          up: [0, 1, 0],         // Camera up vector
+        }}
+      >
+        {/* Lighting */}
+        <ambientLight intensity={0}/>
+        <pointLight position={[1, 1, 2]} angle={0.25} penumbra={1} decay={0} intensity={Math.PI}/>
+        <pointLight position={[-5, -5, -5]} decay={0} intensity={3}/>
+        <pointLight position={[-5, -5, 0]} angle={0.25} penumbra={1} decay={0} intensity={2}/>
 
-      {/* 3D Components */}
-      <OrbitControls />
-      {/* Wanted to test out to have BloomProvider context to only allow bloom render of elements
+        {/* 3D Components */}
+        <OrbitControls/>
+        {/* Wanted to test out to have BloomProvider context to only allow bloom render of elements
         * inside this, however I opt for the solution to only have one render and EffectComposer adds
         * bloom to whole scene when used in one render. We got a good scene when turning off the
         * ambientLight */}
-      <BloomProvider>
-        <EffectComposer>
-          <Bloom
-            intensity={4.0}  // Adjust intensity of the bloom effect - - - MAX it baby
-            width={500}  // Resolution width for bloom
-            height={500} // Resolution height for bloom
-            kernelSize={2} // Bloom size, adjust as needed
-          />
-        </EffectComposer>
-      </BloomProvider>
-      <ParticleBeams innerRadius={1} outerRadius={2}/>
-      <Book/>
-      <Text
-        position={[0, 0, 0.3]}
-        fontSize={0.2}
-        color="orange"
-        anchorX="center"
-        anchorY="middle"
-      >
-        Hello Mom!!
-      </Text>
-    </Canvas>
+        <BloomProvider>
+          <EffectComposer>
+            <Bloom
+              intensity={4.0}  // Adjust intensity of the bloom effect - - - MAX it baby
+              width={500}  // Resolution width for bloom
+              height={500} // Resolution height for bloom
+              kernelSize={2} // Bloom size, adjust as needed
+            />
+          </EffectComposer>
+        </BloomProvider>
+        <ParticleBeams innerRadius={1} outerRadius={2}/>
+        <Book/>
+        <Text
+          position={[0, 0, 0.3]}
+          fontSize={0.2}
+          color="orange"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Hello Mom!!
+        </Text>
+      </Canvas>
     </TextureProvider>
   );
 };

@@ -3,13 +3,16 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { animated, useSpring } from "@react-spring/three";
 
+// Initialize positions and velocities
 const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
-  // Initialize positions and velocities
   const particlesRef = useRef();
   const beamCount = 10; // Number of beams
   const particlesPerBeam = 100; // Number of particles per beam
   const positions = new Float32Array(beamCount * particlesPerBeam * 3); // 3 components per particle (x, y, z)
   const velocities = new Float32Array(beamCount * particlesPerBeam * 3);
+  let radius = 1;
+  let offsetX = 0.1;
+  let offsetZ = 0.1;
 
   const beamSpring = useSpring({
     rotation: [-Math.PI / 2, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
@@ -20,15 +23,17 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   // NOTE: Currently we have a wider spread of particles at the former frames
   // and progressively they tighten up. We should check the t and some other things
 
+  // INITIALIZE PARTICLES
+
   let index = 0;
   for (let b = 0; b < beamCount; b++) {
-    const angle = (b / beamCount) * Math.PI * 2; // Spread beams evenly around the circle
+    const angle = (b / beamCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.1; // Spread beams evenly around the circle
     const dirX = Math.cos(angle);
     const dirZ = Math.sin(angle);
 
     for (let p = 0; p < particlesPerBeam; p++) {
       const t = p / particlesPerBeam; // Progress along the beam (0 to 1)
-      const radius = innerRadius + t * (outerRadius - innerRadius);  // linear interpolation
+      radius = innerRadius + t * (outerRadius - innerRadius);  // linear interpolation
       // classic P(t) = origin + t * vdir
       // Current implementation only uses a scalar as (outerRadius - innerRadius)
       // To gain some spherical spread we can turn this into vectors and generate an
@@ -43,9 +48,8 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       // Seems like this Math.random here can be played with to generate different flow
       // behaviour - - - default: - 0.5, generally it affects the perceived spread
       // which is good to know
-      const offsetX = (Math.random() - 0.1) * 0.5; // Randomness for position
-      const offsetZ = (Math.random() - 0.1) * 0.5;
-      const offsetY = (Math.random() - 0.1) * 0.5;
+      offsetX = (Math.random() - 0.5) * 0.1; // Randomness for position
+      offsetZ = (Math.random() - 0.5) * 0.1;
 
       // Set positions - - - Tinker these values to gain the beam look that we want
       // To gain a more authentic glow experience we would like to have a wider spread
@@ -66,8 +70,23 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
     }
   }
 
+  // UPDATE PARTICLE POSITIONS ON FRAME
+
   useFrame(() => {
     const timeStep = 0.01; // Adjust time step for smooth movement
+
+    // Between these we will allow additional offset boosts for X and Z
+    // NOTE: Since we already work with coordinates that apply spherical/circular outwards
+    // Having an extra circular bound is very redundant. It's enough to do a standard lerp over the radius
+    // NOTE2: As is now the useFrame will use a static value for the radius after the initiliazation
+    // so we will want to have either a useState or update it properly on the frames.
+    // The particle initilization becomes less and less useful lol.
+
+    const smallBound = 0.5
+    const largeBound = 0.2
+    const currentBound = smallBound + radius * (largeBound - smallBound);
+
+    // I guess we lerp them over the radius, lerp on lerp = lol
 
     for (let i = 0; i < positions.length / 3; i++) {
       positions[i * 3] += velocities[i * 3] * timeStep;     // X
@@ -83,8 +102,8 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       if (distance > outerRadius * 1.5) {   // Change the value of outer radius for
         // a delayed reset effect to affect flow -> pulse
         const angle = Math.atan2(z, x);
-        const dirX = Math.cos(angle);
-        const dirZ = Math.sin(angle);
+        const dirX = Math.cos(angle + (Math.random()));  // This is gooche
+        const dirZ = Math.sin(angle + (Math.random()));
 
         positions[i * 3] = innerRadius * dirX;
         positions[i * 3 + 1] = (Math.random() - 0.5);  // Since resets happen quite frequently
