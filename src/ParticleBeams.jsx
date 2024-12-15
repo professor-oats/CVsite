@@ -7,7 +7,7 @@ import { animated, useSpring } from "@react-spring/three";
 const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   const particlesRef = useRef();
   const beamCount = 10; // Number of beams
-  const particlesPerBeam = 100; // Number of particles per beam
+  const particlesPerBeam = 200; // Number of particles per beam
   const positions = new Float32Array(beamCount * particlesPerBeam * 3); // 3 components per particle (x, y, z)
   const velocities = new Float32Array(beamCount * particlesPerBeam * 3);
   let radius = 1;
@@ -51,6 +51,11 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       offsetX = (Math.random() - 0.5) * 0.1; // Randomness for position
       offsetZ = (Math.random() - 0.5) * 0.1;
 
+      // NOTE: WE SHOULD actually go through the initialization since the look of it differs
+      // very much from the useFrame() update, however, looks kind of cool so we can settle for now
+      // took some time to differentiate between the initiliazation vs. update on frame
+      // for some reason I though the init values and it's functions persisted ... brain rot skibidi
+
       // Set positions - - - Tinker these values to gain the beam look that we want
       // To gain a more authentic glow experience we would like to have a wider spread
       // In the start of the t value and also a higher particle density there for balance
@@ -61,7 +66,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       positions[index + 2] = radius * dirZ + offsetZ;   // z
 
       // Set velocities
-      const velocityScale = 2;
+      const velocityScale = 20;
       velocities[index] = dirX * velocityScale;   // vx
       velocities[index + 1] = 0;                 // vy
       velocities[index + 2] = dirZ * velocityScale;   // vz
@@ -102,7 +107,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       if (distance > outerRadius * 1.5) {   // Change the value of outer radius for
         // a delayed reset effect to affect flow -> pulse
         const angle = Math.atan2(z, x);
-        const dirX = Math.cos(angle + (Math.random()));  // This is gooche
+        const dirX = Math.cos(angle + (Math.random()));  // This is gooche - We can settle by this for now
         const dirZ = Math.sin(angle + (Math.random()));
 
         positions[i * 3] = innerRadius * dirX;
@@ -126,6 +131,9 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
     <animated.group position={beamSpring.position} rotation={beamSpring.rotation}>
     <points ref={particlesRef}>
       <bufferGeometry>
+        {/* As far as I understand it bufferGeomtry already instances a matrix on what to render
+          * on the buffer (bufferAttributes) to avoid unecessary GPU calls. So making an extra instancing may just
+          * be redundant */}
         <bufferAttribute
           attach="attributes-position"
           count={positions.length / 3}  // This is the separator calc to let THREE know
@@ -136,7 +144,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.007} // Size of each particle
+        size={0.01} // Size of each particle
         color={new THREE.Color(0xff7aa7)}  // Blend different colors for fancy light
         // or crank up the bloom more (god) to gain proper lighting when not using white color?
         roughness={0}
