@@ -28,13 +28,24 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
 
     for (let p = 0; p < particlesPerBeam; p++) {
       const t = p / particlesPerBeam; // Progress along the beam (0 to 1)
-      const radius = innerRadius + t * (outerRadius - innerRadius);  // linear progression
+      const radius = innerRadius + t * (outerRadius - innerRadius);  // linear interpolation
+      // classic P(t) = origin + t * vdir
+      // Current implementation only uses a scalar as (outerRadius - innerRadius)
+      // To gain some spherical spread we can turn this into vectors and generate an
+      // offset to the positions
+
+      // GET BUSY: To gain foundation for lighting beams we should assign a
+      // smaller circular boundary, at innerRadius, for where the particles can take place
+      // and a wider circular boundary at the outerRadius and then have them
+      // translate over the radial space, we may want to add an offsetY too,
+      // we'll play a little
 
       // Seems like this Math.random here can be played with to generate different flow
       // behaviour - - - default: - 0.5, generally it affects the perceived spread
       // which is good to know
       const offsetX = (Math.random() - 0.1) * 0.5; // Randomness for position
       const offsetZ = (Math.random() - 0.1) * 0.5;
+      const offsetY = (Math.random() - 0.1) * 0.5;
 
       // Set positions - - - Tinker these values to gain the beam look that we want
       // To gain a more authentic glow experience we would like to have a wider spread
@@ -107,7 +118,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       </bufferGeometry>
       <pointsMaterial
         size={0.007} // Size of each particle
-        color={new THREE.Color(0x4aeaff)}  // Blend different colors for fancy light
+        color={new THREE.Color(0xff7aa7)}  // Blend different colors for fancy light
         // or crank up the bloom more (god) to gain proper lighting when not using white color?
         roughness={0}
         transparent={false} // Set transparency true or false, go with false so far

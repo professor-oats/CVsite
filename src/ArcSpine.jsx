@@ -26,7 +26,7 @@ const ArcSpine = () => {
     <mesh>
       <extrudeGeometry args={[spineShape, extrudeSettings]} />
       <meshStandardMaterial
-        color="#2d194d"
+        color="black"
         normalMap={textures.normalLeather}
         diffuseMap={textures.diffuseLeather}
         roughness={0.6}

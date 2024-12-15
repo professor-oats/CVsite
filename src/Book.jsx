@@ -87,7 +87,7 @@ const Book = () => {
         <mesh ref={frontCoverRef} position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
-            color="#2d194d"
+            color="black"  // #2d194d
             normalMap={textures.normalLeather}
             diffuseMap={textures.diffuseLeather}
             roughness={0.4}
@@ -110,7 +110,7 @@ const Book = () => {
         <mesh ref={backCoverRef} position={[0, 0, -0.1]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
-            color="#2d194d"
+            color="black"
             normalMap={textures.normalLeather}
             diffuseMap={textures.diffuseLeather}
             roughness={0.4}

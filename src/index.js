@@ -46,8 +46,8 @@ const MainApp = () => {
     >
       {/* Lighting */}
       <ambientLight intensity={0} />
-      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
-      <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
+      <spotLight position={[5, 5, 5]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
+      <pointLight position={[-5, -5, -5]} decay={0} intensity={Math.PI} />
 
       {/* 3D Components */}
       <OrbitControls />
