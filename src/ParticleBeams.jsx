@@ -15,8 +15,8 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   let offsetZ = 0.1;
 
   const beamSpring = useSpring({
-    rotation: [-Math.PI / 2, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
-    position: [0, 0, 0.3],  // Slight fronting of the anim
+    rotation: [-Math.PI / 2, -Math.PI, Math.PI / 32], // Rotation: x (tilt), y (45°), z
+    position: [0.01, -0.04, 0.6],  // Slight fronting of the anim
     config: { duration: 0 }, // Static, no animation
   });
 
@@ -78,7 +78,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   // UPDATE PARTICLE POSITIONS ON FRAME
 
   useFrame(() => {
-    const timeStep = 0.01; // Adjust time step for smooth movement
+    const timeStep = 0.0005; // Adjust time step for smooth movement
 
     // Between these we will allow additional offset boosts for X and Z
     // NOTE: Since we already work with coordinates that apply spherical/circular outwards
@@ -104,11 +104,11 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       const z = positions[i * 3 + 2];
       const distance = Math.sqrt(x * x + y * y + z * z);
 
-      if (distance > outerRadius * 1.5) {   // Change the value of outer radius for
+      if (distance > outerRadius * 1) {   // Change the value of outer radius for
         // a delayed reset effect to affect flow -> pulse
         const angle = Math.atan2(z, x);
-        const dirX = Math.cos(angle + (Math.random()));  // This is gooche - We can settle by this for now
-        const dirZ = Math.sin(angle + (Math.random()));
+        const dirX = Math.cos((angle) + (Math.random() * 1));  // This is gooche - We can settle by this for now
+        const dirZ = Math.sin((angle) + (Math.random() * 1));
 
         positions[i * 3] = innerRadius * dirX;
         positions[i * 3 + 1] = (Math.random() - 0.5);  // Since resets happen quite frequently
@@ -144,8 +144,8 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.01} // Size of each particle
-        color={new THREE.Color(0xff7aa7)}  // Blend different colors for fancy light
+        size={0.016} // Size of each particle
+        color={new THREE.Color(0xf24467)}  // Blend different colors for fancy light 0xff7aa7
         // or crank up the bloom more (god) to gain proper lighting when not using white color?
         roughness={0}
         transparent={false} // Set transparency true or false, go with false so far

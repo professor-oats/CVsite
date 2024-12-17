@@ -66,17 +66,8 @@ const MainApp = () => {
             />
           </EffectComposer>
         </BloomProvider>
-        <ParticleBeams innerRadius={1} outerRadius={2}/>
+        <ParticleBeams innerRadius={0.9} outerRadius={2}/>
         <Book/>
-        <Text
-          position={[0, 0, 0.3]}
-          fontSize={0.2}
-          color="orange"
-          anchorX="center"
-          anchorY="middle"
-        >
-          Hello Mom!!
-        </Text>
       </Canvas>
     </TextureProvider>
   );
