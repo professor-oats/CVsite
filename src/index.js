@@ -9,8 +9,10 @@ import { OrbitControls } from '@react-three/drei';
 import './styles.css'
 import { TextureProvider } from "./TextureContext";
 import { BloomProvider } from './BloomContext';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, Outline } from '@react-three/postprocessing';
 import { animated, useSpring } from "@react-spring/three";
+import {useState, useEffect} from "react";
+import * as THREE from 'three';
 
 /* Note:
  * Adding bloom effect as a post render to certain elements is a very hacky way
@@ -32,6 +34,10 @@ const MainApp = () => {
     rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
     config: { duration: 0 }, // Static, no animation
   });
+
+  // Access the bookRef from our Book.jsx
+  const [frontCoverRef, setFrontCoverRef] = useState(null);
+  const [backCoverRef, setBackCoverRef] = useState(null);
 
   return (
     <TextureProvider>
@@ -66,8 +72,11 @@ const MainApp = () => {
             />
           </EffectComposer>
         </BloomProvider>
-        <ParticleBeams innerRadius={0.9} outerRadius={2}/>
-        <Book/>
+        {/*<ParticleBeams innerRadius={0.9} outerRadius={2}/>*/}
+        <Book
+          setFrontCoverRef={setFrontCoverRef}
+          setBackCoverRef={setBackCoverRef}
+        />
       </Canvas>
     </TextureProvider>
   );

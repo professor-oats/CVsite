@@ -4,8 +4,9 @@ import { animated, useSpring } from '@react-spring/three'; // Will be used futhe
 import MultiplePages from "./PagesMultiple";
 import ArcSpine from "./ArcSpine";
 import { useTextures } from './TextureContext';
+import OutlineEffect from "./OutlineEffect";
 
-const Book = () => {
+const Book = ({setFrontCoverRef, setBackCoverRef}) => {
   const bookRef = useRef(); // Reference for the entire book
   const frontCoverGroupRef = useRef(); // Reference for the front cover
   const frontCoverRef = useRef();
@@ -14,6 +15,12 @@ const Book = () => {
   const centerRef = useRef();
   const spineRef = useRef();
   const textures = useTextures();
+
+  // Need to useEffect to pass refs to parent/index.js
+  React.useEffect(() => {
+    if (setFrontCoverRef) setFrontCoverRef(frontCoverRef);
+    if (setBackCoverRef) setBackCoverRef(backCoverRef);
+  }, [setFrontCoverRef, setBackCoverRef]);
 
   const bookSpring = useSpring({
     rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
@@ -45,13 +52,14 @@ const Book = () => {
 
     /* Lerp this? */
     if (bookRef.current) {
+
       if (movingUp.current) {
-        bookRef.current.position.y += 0.0008;
-        if (bookRef.current.position.y >= startingPositionY.current + 0.05) {
+        bookRef.current.position.y += 0.0016;
+        if (bookRef.current.position.y >= startingPositionY.current + 0.08) {
           movingUp.current = false; // Change direction to move down
         }
       } else {
-        bookRef.current.position.y -= 0.0008;
+        bookRef.current.position.y -= 0.0016;
         if (bookRef.current.position.y <= startingPositionY.current - 0.01) {
           movingUp.current = true; // Change direction to move up
         }
@@ -79,7 +87,6 @@ const Book = () => {
   // kind of abusing that the default position is [0,0,0] here
   return (
     <animated.group>
-      {/* Adding glow to the group */}
 
       {/* Front Cover */}
       <animated.group ref={bookRef} rotation={bookSpring.rotation}>
@@ -123,6 +130,15 @@ const Book = () => {
       <mesh position={[-0.503, -0.75, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
         <ArcSpine/>
       </mesh>
+
+        {/* Outline Effects */}
+        {frontCoverRef?.current && (
+          <OutlineEffect objectRef={frontCoverRef} color="blue" />
+        )}
+        {backCoverRef?.current && (
+          <OutlineEffect objectRef={backCoverRef} color="green" />
+        )}
+
       </animated.group>
 
 
