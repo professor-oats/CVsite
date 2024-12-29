@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import * as THREE from 'three';
 
 // Shader time bby - Fuzzy outline shader
@@ -10,7 +10,7 @@ const fuzzyOutlineShader = {
   uniforms: {
     color: { value: new THREE.Color("red") },
     opacity: { value: 0.1 },
-    time: { value: 0.0 },
+    time: { value: 0.2 },
   },
   vertexShader: `
     varying vec3 vPosition;
@@ -33,13 +33,10 @@ const fuzzyOutlineShader = {
       float dist = length(vPosition.xy * 1.5);
       
       // Apply a gradient to create the fuzziness effect
-      //float edgeEffect = smoothstep(0.7, 1.2, dist + sin(time * 0.4) * 10.0); 
-      
-      // Debug output: visualize sine effect based on time
-      float sinEffect = sin(time) * 0.5 + 0.5; // Normalize to [0, 1]
-      gl_FragColor = vec4(vPosition * 0.5 + 0.5, 1.0); // Visualize the position in colors
+      //float edgeEffect = smoothstep(0.7, 1.2, dist + sin(time * 0.4) * 10.0);
+      float edgeEffect = smoothstep(0.5 + sin(0.1 * time) * 0.5, 1.0, dist); // Modify the edge threshold with time oscillation
 
-      //gl_FragColor = vec4(color, opacity * edgeEffect);
+      gl_FragColor = vec4(color, opacity * edgeEffect);
     }
   `
 };
@@ -47,10 +44,19 @@ const fuzzyOutlineShader = {
 const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.25, time }) => {
   const materialRef = useRef();
 
+
+  // Memoize the uniforms to avoid recreating them on each render
+  const uniforms = useMemo(() => ({
+    color: { value: new THREE.Color(color) },
+    opacity: { value: 0.4 },
+    time: { value: 0.0 }, // Initial value
+  }), []); // Static; does not depend on `time`
+
   // Dynamically update the shader material's uniforms
   useEffect(() => {
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = time;
+      console.log(materialRef.current.uniforms.time.value);
     }
   }, [time]);
 
@@ -70,11 +76,7 @@ const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.25, time 
       >
         <shaderMaterial
           ref={materialRef} // Attach ref to update uniforms dynamically
-          uniforms={{
-            color: {value: new THREE.Color(color)},
-            opacity: {value: 0.4},
-            time: {value:0.0}, // Initial value; updated via useFrame
-          }}
+          uniforms={uniforms} // Pass the memoized uniforms object
           vertexShader={fuzzyOutlineShader.vertexShader}
           fragmentShader={fuzzyOutlineShader.fragmentShader}
           transparent={true}

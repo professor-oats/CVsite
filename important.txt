@@ -1,0 +1,10 @@
+About making your shaders/shaderMaterial
+You kind of need to use useMemo so we don't recreate a full uniform on each render
+when we want to update any of its properties:
+https://discourse.threejs.org/t/why-float-uniform-is-not-updating/50068/5
+
+Overall it seems effy to make shaders coupled with React, which I experienced also.
+Best approach would be to make renders fully in a solid Vite with Three.js.
+
+Also. To make changed for the current object that we have memoized we need
+to approach the uniform with get and set.
