@@ -27,6 +27,17 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
     config: { duration: 0 }, // Static, no animation
   });
 
+  // Time counter to use for animations
+  const [time, setTime] = React.useState(0);
+
+  useEffect(() => {
+    const animate = () => {
+      setTime((prev) => prev + 0.01);
+      requestAnimationFrame(animate);
+    };
+    animate();
+  }, []);
+
   // Spring for adding emmisiveness/glow to mesh
   const emissiveSpring = useSpring({
     emissiveIntensity: 1.0, // Target emissive intensity
@@ -133,10 +144,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
 
         {/* Outline Effects */}
         {frontCoverRef?.current && (
-          <OutlineEffect objectRef={frontCoverRef} color="blue" />
-        )}
-        {backCoverRef?.current && (
-          <OutlineEffect objectRef={backCoverRef} color="green" />
+          <OutlineEffect objectRef={frontCoverRef} color="orange" time={time} />
         )}
 
       </animated.group>
