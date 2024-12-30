@@ -6,8 +6,8 @@ import { animated, useSpring } from "@react-spring/three";
 // Initialize positions and velocities
 const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   const particlesRef = useRef();
-  const beamCount = 10; // Number of beams
-  const particlesPerBeam = 200; // Number of particles per beam
+  const beamCount = 8; // Number of beams
+  const particlesPerBeam = 80; // Number of particles per beam
   const positions = new Float32Array(beamCount * particlesPerBeam * 3); // 3 components per particle (x, y, z)
   const velocities = new Float32Array(beamCount * particlesPerBeam * 3);
   let radius = 1;
@@ -15,7 +15,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   let offsetZ = 0.1;
 
   const beamSpring = useSpring({
-    rotation: [-Math.PI / 2, -Math.PI, Math.PI / 32], // Rotation: x (tilt), y (45°), z
+    rotation: [-Math.PI / 2, -Math.PI * 0.2, Math.PI / 32], // Rotation: x (tilt), y (45°), z
     position: [0.01, -0.04, 0.6],  // Slight fronting of the anim
     config: { duration: 0 }, // Static, no animation
   });
@@ -48,7 +48,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       // Seems like this Math.random here can be played with to generate different flow
       // behaviour - - - default: - 0.5, generally it affects the perceived spread
       // which is good to know
-      offsetX = (Math.random() - 0.5) * 0.1; // Randomness for position
+      offsetX = (Math.random() - 0.5) * 0.1; // Init pos offset, affects initial beams width
       offsetZ = (Math.random() - 0.5) * 0.1;
 
       // NOTE: WE SHOULD actually go through the initialization since the look of it differs
@@ -61,8 +61,11 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       // In the start of the t value and also a higher particle density there for balance
       // We also want to manage the particle size and velocity to start gaining actual light beams
 
+      // Update 18/12, not fully satisfied with init pos but think I have to settle
+      // for time efficiency
+
       positions[index] = radius * dirX + offsetX;   // x
-      positions[index + 1] = (Math.random() - 0.5) * 0.1; // y
+      positions[index + 1] = (Math.random() - 0.5) * 2; // y
       positions[index + 2] = radius * dirZ + offsetZ;   // z
 
       // Set velocities
@@ -104,16 +107,15 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       const z = positions[i * 3 + 2];
       const distance = Math.sqrt(x * x + y * y + z * z);
 
-      if (distance > outerRadius * 1) {   // Change the value of outer radius for
+      if (distance > outerRadius * 2) {   // Change the value of outer radius for
         // a delayed reset effect to affect flow -> pulse
-        const angle = Math.atan2(z, x);
-        const dirX = Math.cos((angle) + (Math.random() * 1));  // This is gooche - We can settle by this for now
-        const dirZ = Math.sin((angle) + (Math.random() * 1));
+        const angle = Math.atan2(z * Math.random() * Math.random(), x * Math.random() * 2 * Math.random());
+        const dirX = Math.cos((angle) + (Math.random() * 1.5));  // This is gooche - We can settle by this for now
+        const dirZ = Math.sin((angle) + (Math.random() * 1.5));
 
-        positions[i * 3] = innerRadius * dirX;
-        positions[i * 3 + 1] = (Math.random() - 0.5);  // Since resets happen quite frequently
-        // this is the most occurring y pos
-        positions[i * 3 + 2] = innerRadius * dirZ;
+        positions[i * 3] = innerRadius * 20 * dirX * (Math.random() - 0.5);
+        positions[i * 3 + 1] = (Math.random() - 0.5);
+        positions[i * 3 + 2] = innerRadius * 20 * dirZ * (Math.random() - 0.5);
       }
     }
 
@@ -144,7 +146,7 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.016} // Size of each particle
+        size={0.026} // Size of each particle
         color={new THREE.Color(0xf24467)}  // Blend different colors for fancy light 0xff7aa7
         // or crank up the bloom more (god) to gain proper lighting when not using white color?
         roughness={0}
