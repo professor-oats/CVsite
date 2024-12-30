@@ -6,11 +6,14 @@ import * as THREE from 'three';
 // going into the main animations. Takes time to pass the time correctly (ironic)
 // and we are really hitting the wall here.
 
+// I will try to performance optimise as far as possible, but I think
+// we start to pass the threshold for older machines now
+
 const fuzzyOutlineShader = {
   uniforms: {
     color: { value: new THREE.Color("red") },
     opacity: { value: 0.1 },
-    time: { value: 0.2 },
+    time: { value: 0.0 },
   },
   vertexShader: `
     varying vec3 vPosition;
@@ -30,25 +33,32 @@ const fuzzyOutlineShader = {
 
     void main() {
       // Create a "fuzzy" effect by distorting the edges based on the distance from the center
-      float dist = length(vPosition.xy * 1.5);
+      //float dist = length(vPosition.xy * 1.5); //- Radial shrink and growth
+      
+        // Transform vPosition into normalized coordinates for box geometry
+      vec3 normalizedPosition = abs(vPosition); // Use absolute value for symmetry
+      float maxCoord = max(max(normalizedPosition.x, normalizedPosition.y), normalizedPosition.z);
+
+      // Apply an effect based on maxCoord to outline the box edges
+      float edgeEffect = 0.5 + 0.5 * sin(15.0 * maxCoord - time * 5.0); // Frequency and speed of ripple
+      // edgeEffect = smoothstep(0.4, 0.6, edgeEffect); // - If sharpening wanted
       
       // Apply a gradient to create the fuzziness effect
-      //float edgeEffect = smoothstep(0.7, 1.2, dist + sin(time * 0.4) * 10.0);
-      float edgeEffect = smoothstep(0.5 + sin(0.1 * time) * 0.5, 1.0, dist); // Modify the edge threshold with time oscillation
+      //float edgeEffect = smoothstep(0.5 + sin(0.1 * time) * 0.5, 1.0, dist); // Modify the edge threshold with time oscillation
 
       gl_FragColor = vec4(color, opacity * edgeEffect);
     }
   `
 };
 
-const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.25, time }) => {
+const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.5, time }) => {
   const materialRef = useRef();
 
 
   // Memoize the uniforms to avoid recreating them on each render
   const uniforms = useMemo(() => ({
     color: { value: new THREE.Color(color) },
-    opacity: { value: 0.4 },
+    opacity: { value: 0.7 },
     time: { value: 0.0 }, // Initial value
   }), []); // Static; does not depend on `time`
 
@@ -65,12 +75,12 @@ const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.25, time 
       <mesh
         geometry={objectRef.current.geometry}
         scale={[
-          scaleMultiplier,
+          scaleMultiplier + 0.5,
           scaleMultiplier,
           scaleMultiplier
         ]}
         // We will need to offset the position.z to get mid pos
-        position={[objectRef.current.position.x, objectRef.current.position.y, objectRef.current.position.z + 0.5]}
+        position={[objectRef.current.position.x, objectRef.current.position.y, objectRef.current.position.z - 0.1]}
         rotation={objectRef.current.rotation}
         layers={objectRef.current.layers} // Ensure it follows the same layers (if used)
       >

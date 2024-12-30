@@ -32,7 +32,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
 
   useEffect(() => {
     const animate = () => {
-      setTime((prev) => prev + 0.01);
+      setTime((prev) => prev + 0.1);
       requestAnimationFrame(animate);
     };
     animate();
