@@ -40,18 +40,24 @@ const fuzzyOutlineShader = {
       float maxCoord = max(max(normalizedPosition.x, normalizedPosition.y), normalizedPosition.z);
 
       // Apply an effect based on maxCoord to outline the box edges
-      float edgeEffect = 0.5 + 0.5 * sin(15.0 * maxCoord - time * 5.0); // Frequency and speed of ripple
+      float edgeEffect = 0.5 + 0.5 * sin(15.0 * maxCoord - time * 1.0); // Frequency and speed of ripple
       // edgeEffect = smoothstep(0.4, 0.6, edgeEffect); // - If sharpening wanted
       
-      // Apply a gradient to create the fuzziness effect
-      //float edgeEffect = smoothstep(0.5 + sin(0.1 * time) * 0.5, 1.0, dist); // Modify the edge threshold with time oscillation
+      
+      // Edge fuzziness: fade opacity near the edges
+      float edgeFuzz = smoothstep(0.5, 0.1, maxCoord); // Fade out as dist approaches 1.0 (edge)
 
-      gl_FragColor = vec4(color, opacity * edgeEffect);
+      // Combine ripple and fuzziness
+      float finalOpacity = opacity * edgeEffect * edgeFuzz;
+
+      // Output the final color with applied opacity
+      gl_FragColor = vec4(color, finalOpacity);
     }
   `
 };
 
-const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.5, time }) => {
+// Increase the scaleMultiplier later on on hover
+const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.2, time }) => {
   const materialRef = useRef();
 
 
@@ -75,12 +81,12 @@ const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.5, time }
       <mesh
         geometry={objectRef.current.geometry}
         scale={[
-          scaleMultiplier + 0.5,
-          scaleMultiplier,
+          scaleMultiplier + 0.30,
+          scaleMultiplier + 0.6,
           scaleMultiplier
         ]}
         // We will need to offset the position.z to get mid pos
-        position={[objectRef.current.position.x, objectRef.current.position.y, objectRef.current.position.z - 0.1]}
+        position={[objectRef.current.position.x, objectRef.current.position.y - 0.014, objectRef.current.position.z - 0.1]}
         rotation={objectRef.current.rotation}
         layers={objectRef.current.layers} // Ensure it follows the same layers (if used)
       >

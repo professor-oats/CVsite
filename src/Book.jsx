@@ -16,6 +16,11 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
   const spineRef = useRef();
   const textures = useTextures();
 
+  const [isBookHovered, setIsBookHovered] = useState(false);
+
+  // Define the hover scale multiplier
+  const hoverBookScaleMultiplier = isBookHovered ? 1.4 : 1.2; // Adjust as seeing fit
+
   // Need to useEffect to pass refs to parent/index.js
   React.useEffect(() => {
     if (setFrontCoverRef) setFrontCoverRef(frontCoverRef);
@@ -101,7 +106,10 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
 
       {/* Front Cover */}
       <animated.group ref={bookRef} rotation={bookSpring.rotation}>
-      <group ref={frontCoverGroupRef}>
+      <group ref={frontCoverGroupRef}
+             onPointerOver={() => setIsBookHovered(true)} // Hover start
+             onPointerOut={() => setIsBookHovered(false)} // Hover end
+      >
         <mesh ref={frontCoverRef} position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
@@ -144,7 +152,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
 
         {/* Outline Effects */}
         {frontCoverRef?.current && (
-          <OutlineEffect objectRef={frontCoverRef} color="red" time={time} />
+          <OutlineEffect objectRef={frontCoverRef} color="red" time={time} scaleMultiplier={hoverBookScaleMultiplier} />
         )}
 
       </animated.group>
