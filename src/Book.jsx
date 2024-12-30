@@ -6,7 +6,7 @@ import ArcSpine from "./ArcSpine";
 import { useTextures } from './TextureContext';
 import OutlineEffect from "./OutlineEffect";
 
-const Book = ({setFrontCoverRef, setBackCoverRef}) => {
+const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen = 0}) => {
   const bookRef = useRef(); // Reference for the entire book
   const frontCoverGroupRef = useRef(); // Reference for the front cover
   const frontCoverRef = useRef();
@@ -21,6 +21,22 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
   // Define the hover scale multiplier
   const hoverBookScaleMultiplier = isBookHovered ? 1.4 : 1.2; // Adjust as seeing fit
 
+  // State for book opening
+  const [isOpened, setIsOpened] = useState(false);
+
+  const [spineColor, setSpineColor] = useState('black'); // Initial color
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSpineColor(isOpened ? 'beige' : 'black'); // Change color after delay
+    }, 300); // Delay in milliseconds (1 second in this case)
+
+    // Cleanup timer on component unmount or when `isOpened` changes
+    return () => clearTimeout(timer);
+  }, [isOpened]);
+
+  //console.log(isOpened);
+
   // Need to useEffect to pass refs to parent/index.js
   React.useEffect(() => {
     if (setFrontCoverRef) setFrontCoverRef(frontCoverRef);
@@ -32,6 +48,24 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
     config: { duration: 0 }, // Static, no animation
   });
 
+  // Spring animations for book opening
+  const { frontCoverRotation, backCoverRotation, bookScale } = useSpring({
+    frontCoverRotation: isOpened ? -Math.PI : 0, // Rotate the front cover to 90°
+    backCoverRotation: isOpened ? -Math.PI / 16 : 0, // Slight rotation of the back cover
+    bookScale: isOpened ? 1.5 : 1, // Scale the book to emphasize the pages
+    config: { tension: 180, friction: 100 },
+    onRest: () => {
+      if (isOpened && onBookOpen) {
+        onBookOpen(); // Notify parent when book is fully opened
+        // Acts as a callback to parent so we can use this conditionally
+      }
+    },
+  });
+
+  const handleBookClick = () => {
+    setIsOpened(true); // Toggle the book open state
+  };
+
   // Time counter to use for animations
   const [time, setTime] = React.useState(0);
 
@@ -42,16 +76,6 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
     };
     animate();
   }, []);
-
-  // Spring for adding emmisiveness/glow to mesh
-  const emissiveSpring = useSpring({
-    emissiveIntensity: 1.0, // Target emissive intensity
-    from: { emissiveIntensity: 0 }, // Starting emissive intensity
-    config: { duration: 1000 },
-    loop: { reverse: true },
-  });
-
-  const [opened, setOpened] = useState(false);  // Will use this when opening book
 
   const startingPositionY = useRef(0); // Use a ref to store the initial Y position
   const movingUp = useRef(true); // Track the movement direction
@@ -105,11 +129,16 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
     <animated.group>
 
       {/* Front Cover */}
-      <animated.group ref={bookRef} rotation={bookSpring.rotation}>
-      <group ref={frontCoverGroupRef}
+      {/* We will want to make another animated.group to parent the frontCoverGroupRef
+        * so we can x-pivot the rotation-y */}
+      <animated.group ref={bookRef} rotation={bookSpring.rotation} onClick={handleBookClick}>
+      <animated.group ref={frontCoverGroupRef}
              onPointerOver={() => setIsBookHovered(true)} // Hover start
              onPointerOut={() => setIsBookHovered(false)} // Hover end
+             position={[-0.5, 0, 0]} // pivot-x
+             rotation-y={frontCoverRotation}
       >
+      <animated.group position={[0.5, 0, 0]}> {/* pivot over x back from parent */}
         <mesh ref={frontCoverRef} position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
@@ -120,7 +149,8 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
           />
         </mesh>
         <MultiplePages z_origin={0.075} z_directed={0.015}/>
-      </group>
+      </animated.group>
+      </animated.group>
 
       {/* This is where the CV render will take place, like have four pages
         * to flip through with different rendered content
@@ -147,11 +177,11 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
 
         {/* spine */}
       <mesh position={[-0.503, -0.75, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ArcSpine/>
+        <ArcSpine spineColor={spineColor}/>
       </mesh>
 
         {/* Outline Effects */}
-        {frontCoverRef?.current && (
+        {frontCoverRef?.current && !isOpened && (
           <OutlineEffect objectRef={frontCoverRef} color="red" time={time} scaleMultiplier={hoverBookScaleMultiplier} />
         )}
 

@@ -72,7 +72,6 @@ const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.2, time }
   useEffect(() => {
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = time;
-      console.log(materialRef.current.uniforms.time.value);
     }
   }, [time]);
 
