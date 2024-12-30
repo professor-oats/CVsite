@@ -43,7 +43,7 @@ const MainApp = () => {
     <TextureProvider>
       <Canvas
         camera={{
-          position: [0, 0, 4],  // Camera position
+          position: [0, 0, 8],  // Camera position
           fov: 55,               // Field of view
           near: 0.1,             // Near clipping plane
           far: 1000,             // Far clipping plane
@@ -72,7 +72,7 @@ const MainApp = () => {
             />
           </EffectComposer>
         </BloomProvider>
-        {/*<ParticleBeams innerRadius={0.9} outerRadius={2}/>*/}
+        <ParticleBeams innerRadius={0.8} outerRadius={1.8}/>
         <Book
           setFrontCoverRef={setFrontCoverRef}
           setBackCoverRef={setBackCoverRef}

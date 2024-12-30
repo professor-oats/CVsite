@@ -144,7 +144,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef}) => {
 
         {/* Outline Effects */}
         {frontCoverRef?.current && (
-          <OutlineEffect objectRef={frontCoverRef} color="blue" time={time} />
+          <OutlineEffect objectRef={frontCoverRef} color="red" time={time} />
         )}
 
       </animated.group>

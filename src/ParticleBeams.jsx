@@ -2,26 +2,30 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { animated, useSpring } from "@react-spring/three";
+import { Noise } from "noisejs";
 
 // Initialize positions and velocities
 const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
   const particlesRef = useRef();
-  const beamCount = 8; // Number of beams
-  const particlesPerBeam = 80; // Number of particles per beam
+  const beamCount = 12; // Number of beams
+  const particlesPerBeam = 20; // Number of particles per beam
   const positions = new Float32Array(beamCount * particlesPerBeam * 3); // 3 components per particle (x, y, z)
   const velocities = new Float32Array(beamCount * particlesPerBeam * 3);
+  const noise = new Noise(Math.random());
   let radius = 1;
   let offsetX = 0.1;
   let offsetZ = 0.1;
 
   const beamSpring = useSpring({
-    rotation: [-Math.PI / 2, -Math.PI * 0.2, Math.PI / 32], // Rotation: x (tilt), y (45°), z
-    position: [0.01, -0.04, 0.6],  // Slight fronting of the anim
+    rotation: [-Math.PI / 2, -Math.PI * 0.2, Math.PI / 22], // Rotation: x (tilt), y (45°), z
+    position: [0.26, 0.12, -0.2],  // Slight fronting of the anim
     config: { duration: 0 }, // Static, no animation
   });
 
   // NOTE: Currently we have a wider spread of particles at the former frames
   // and progressively they tighten up. We should check the t and some other things
+
+  // Update: Ugliest particle system I have made, also the first ...
 
   // INITIALIZE PARTICLES
 
@@ -34,6 +38,8 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
     for (let p = 0; p < particlesPerBeam; p++) {
       const t = p / particlesPerBeam; // Progress along the beam (0 to 1)
       radius = innerRadius + t * (outerRadius - innerRadius);  // linear interpolation
+      const noiseX = noise.perlin3(dirX * 0.01, angle * 0.01, radius * 0.002);
+      const noiseZ = noise.perlin3(dirZ * 0.01, angle * 0.01, radius * 0.002);
       // classic P(t) = origin + t * vdir
       // Current implementation only uses a scalar as (outerRadius - innerRadius)
       // To gain some spherical spread we can turn this into vectors and generate an
@@ -64,15 +70,15 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       // Update 18/12, not fully satisfied with init pos but think I have to settle
       // for time efficiency
 
-      positions[index] = radius * dirX + offsetX;   // x
+      positions[index] = radius * dirX + offsetX * 2 * (Math.random() -0.5) * 100 + 1;   // x
       positions[index + 1] = (Math.random() - 0.5) * 2; // y
-      positions[index + 2] = radius * dirZ + offsetZ;   // z
+      positions[index + 2] = radius * dirZ + offsetZ * 2 * (Math.random() -0.5) * 100 + 1;   // z
 
       // Set velocities
-      const velocityScale = 20;
-      velocities[index] = dirX * velocityScale;   // vx
-      velocities[index + 1] = 0;                 // vy
-      velocities[index + 2] = dirZ * velocityScale;   // vz
+      const velocityScale = 80;
+      velocities[index] = noiseX * velocityScale * Math.random();   // vx
+      velocities[index + 1] = 100 * (Math.random());                 // vy
+      velocities[index + 2] = noiseZ * velocityScale * Math.random();   // vz
 
       index += 3;
     }
@@ -107,9 +113,9 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       const z = positions[i * 3 + 2];
       const distance = Math.sqrt(x * x + y * y + z * z);
 
-      if (distance > outerRadius * 2) {   // Change the value of outer radius for
+      if (distance > outerRadius * 2.2) {   // Change the value of outer radius for
         // a delayed reset effect to affect flow -> pulse
-        const angle = Math.atan2(z * Math.random() * Math.random(), x * Math.random() * 2 * Math.random());
+        const angle = Math.atan2(z, x);
         const dirX = Math.cos((angle) + (Math.random() * 1.5));  // This is gooche - We can settle by this for now
         const dirZ = Math.sin((angle) + (Math.random() * 1.5));
 
