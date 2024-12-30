@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Book from './Book';
-import GlowingAura from './GlowingAura';
 import ParticleBeams from './ParticleBeams';
 import { Canvas, useThree } from "@react-three/fiber";
 import { Text } from '@react-three/drei';
@@ -39,6 +38,10 @@ const MainApp = () => {
   // Access the bookRef from our Book.jsx
   const [frontCoverRef, setFrontCoverRef] = useState(null);
   const [backCoverRef, setBackCoverRef] = useState(null);
+
+  const handleBookOpen = () => {
+    console.log('Book is open')
+  }
 
   return (
   <div>
@@ -109,6 +112,7 @@ const MainApp = () => {
         <Book
           setFrontCoverRef={setFrontCoverRef}
           setBackCoverRef={setBackCoverRef}
+          onBookOpen={handleBookOpen}
         />
       </Canvas>
     </TextureProvider>

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { useTextures } from './TextureContext'
 
-const ArcSpine = () => {
+const ArcSpine = ({spineColor = 'black'}) => {
   const spineShape = new THREE.Shape();
   const textures = useTextures();
 
@@ -26,7 +26,7 @@ const ArcSpine = () => {
     <mesh>
       <extrudeGeometry args={[spineShape, extrudeSettings]} />
       <meshStandardMaterial
-        color="black"
+        color={spineColor}
         normalMap={textures.normalLeather}
         diffuseMap={textures.diffuseLeather}
         roughness={0.6}

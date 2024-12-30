@@ -6,7 +6,7 @@ import ArcSpine from "./ArcSpine";
 import { useTextures } from './TextureContext';
 import OutlineEffect from "./OutlineEffect";
 
-const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen = 0}) => {
+const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   const bookRef = useRef(); // Reference for the entire book
   const frontCoverGroupRef = useRef(); // Reference for the front cover
   const frontCoverRef = useRef();
@@ -25,10 +25,12 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen = 0}) => {
   const [isOpened, setIsOpened] = useState(false);
 
   const [spineColor, setSpineColor] = useState('black'); // Initial color
+  const [spineOffsetZ, setSpineOffsetZ] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setSpineColor(isOpened ? 'beige' : 'black'); // Change color after delay
+      setSpineOffsetZ(isOpened ? 0.13 : 0);  // Set offsetZ after delay
     }, 300); // Delay in milliseconds (1 second in this case)
 
     // Cleanup timer on component unmount or when `isOpened` changes
@@ -50,7 +52,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen = 0}) => {
 
   // Spring animations for book opening
   const { frontCoverRotation, backCoverRotation, bookScale } = useSpring({
-    frontCoverRotation: isOpened ? -Math.PI : 0, // Rotate the front cover to 90°
+    frontCoverRotation: isOpened ? -Math.PI : 0, // Rotate the front cover to -180°
     backCoverRotation: isOpened ? -Math.PI / 16 : 0, // Slight rotation of the back cover
     bookScale: isOpened ? 1.5 : 1, // Scale the book to emphasize the pages
     config: { tension: 180, friction: 100 },
@@ -176,7 +178,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen = 0}) => {
       </group>
 
         {/* spine */}
-      <mesh position={[-0.503, -0.75, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[-0.503, -0.75, 0.05 - spineOffsetZ]} rotation={[-Math.PI / 2, 0, 0]}>
         <ArcSpine spineColor={spineColor}/>
       </mesh>
 
