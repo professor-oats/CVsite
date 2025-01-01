@@ -63,7 +63,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   // Spring animations for book opening
   const { frontCoverRotation, spineRotation } = useSpring({
     frontCoverRotation: isOpened ? -Math.PI : 0, // Rotate the front cover to -180°
-    spineRotation: isOpened ? Math.PI / 2 : 0,
+    spineRotation: isOpened ? -Math.PI / 2 : 0,
     config: (key) =>
       key === 'frontCoverRotation'
         ? { tension: 180, friction: 100 }
@@ -144,7 +144,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
       posMaxZ.current += 0.002;
       backCoverRef.current.position.z = -posMaxZ.current;
       centerRef.current.position.z = -posMaxZ.current;
-      if (posMaxZ.current <= 0.28) {
+      if (posMaxZ.current <= 0.1) {
         spineRef.current.position.z = -posMaxZ.current;
       }
     }

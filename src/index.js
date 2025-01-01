@@ -98,6 +98,8 @@ const MainApp = () => {
         * inside this, however I opt for the solution to only have one render and EffectComposer adds
         * bloom to whole scene when used in one render. We got a good scene when turning off the
         * ambientLight */}
+
+        {/* Ditch the Bloom as soon as we have the book open perhaps */}
         <BloomProvider>
           <EffectComposer>
             <Bloom
