@@ -23,14 +23,22 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
 
   // State for book opening
   const [isOpened, setIsOpened] = useState(false);
+  const [shouldRenderMiddlePages, setShouldRenderMiddlePages] = useState(true); // Lol
 
   const [spineColor, setSpineColor] = useState('black'); // Initial color
   const [spineOffsetZ, setSpineOffsetZ] = useState(0);
+  const [backCoverOffsetZ, setBackCoverOffsetZ] = useState(0);
+
+  const handleBookClick = () => {
+    setShouldRenderMiddlePages(false);
+    setIsOpened(true); // Toggle the book open state
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setSpineColor(isOpened ? 'beige' : 'black'); // Change color after delay
       setSpineOffsetZ(isOpened ? 0.13 : 0);  // Set offsetZ after delay
+      //setBackCoverOffsetZ(isOpened ? 0.1 : 0);
     }, 300); // Delay in milliseconds (1 second in this case)
 
     // Cleanup timer on component unmount or when `isOpened` changes
@@ -45,16 +53,16 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
     if (setBackCoverRef) setBackCoverRef(backCoverRef);
   }, [setFrontCoverRef, setBackCoverRef]);
 
+  // Sleezy way of setting a static rotation but tested to have a Spring going
+  // if we wanted to make some more animation.
   const bookSpring = useSpring({
-    rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
+    rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32],
     config: { duration: 0 }, // Static, no animation
   });
 
   // Spring animations for book opening
-  const { frontCoverRotation, backCoverRotation, bookScale } = useSpring({
+  const { frontCoverRotation } = useSpring({
     frontCoverRotation: isOpened ? -Math.PI : 0, // Rotate the front cover to -180°
-    backCoverRotation: isOpened ? -Math.PI / 16 : 0, // Slight rotation of the back cover
-    bookScale: isOpened ? 1.5 : 1, // Scale the book to emphasize the pages
     config: { tension: 180, friction: 100 },
     onRest: () => {
       if (isOpened && onBookOpen) {
@@ -64,9 +72,6 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
     },
   });
 
-  const handleBookClick = () => {
-    setIsOpened(true); // Toggle the book open state
-  };
 
   // Time counter to use for animations
   const [time, setTime] = React.useState(0);
@@ -80,19 +85,24 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   }, []);
 
   const startingPositionY = useRef(0); // Use a ref to store the initial Y position
+  const startingPositionZ = useRef(0); // This is for the backCoverZ
   const movingUp = useRef(true); // Track the movement direction
+  const posMaxZ = useRef(0);
 
 
   // useFrame here for render custom defined springanim properties
 
   useFrame(() => {
 
-    // Rotate the entire book around the Y-axis + X-axis
+    // Inits here
     if (bookRef.current && startingPositionY.current === 0) {
-      startingPositionY.current = bookRef.current.position.y; // Set initial Y position
+      startingPositionY.current = bookRef.current.position.y;
     }
 
-    /* Lerp this? */
+    if (backCoverRef.current && startingPositionZ.current === 0) {
+      startingPositionZ.current = backCoverRef.current.position.z;
+    }
+
     if (bookRef.current) {
 
       if (movingUp.current) {
@@ -107,11 +117,29 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
         }
       }
     }
-    /* if (frontCoverRef.current) {
-      // Simulate the front cover opening and closing
-      const time = Date.now() * 0.001; // Use time to oscillate the rotation
-      frontCoverRef.current.rotation.y = Math.sin(time) * Math.PI * 0.25; // Rotate ±45 degrees
-    } */
+
+    /* Good to know:
+     * useRef() is a hook in React that creates a mutable reference object.
+     * Unlike state (which triggers re-renders when changed),
+     * useRef() provides a way to persist values across renders
+     * without causing the component to re-render when the value changes.
+     */
+
+    /* Also good to know:
+     * In JavaScript, const does not make an object or array immutable.
+     * Instead, const guarantees that the reference to the object (or array) cannot be reassigned.
+     * This means that the variable itself cannot point to a different object,
+     * but the contents of the object (or array) can still change.
+
+     * When we check the const ref posMaxZ we check the objects current value
+     * that it is holding
+     */
+
+    if (backCoverRef.current && posMaxZ.current <= 0.2 && isOpened) {
+      console.log("Here MF");
+      posMaxZ.current += 0.002;
+      backCoverRef.current.position.z = -posMaxZ.current;
+    }
   });
 
   /* Unless we want some fancy separate animation for pages
@@ -137,10 +165,10 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
       <animated.group ref={frontCoverGroupRef}
              onPointerOver={() => setIsBookHovered(true)} // Hover start
              onPointerOut={() => setIsBookHovered(false)} // Hover end
-             position={[-0.5, 0, 0]} // pivot-x
+             position={[-0.6, 0, 0]} // pivot-x
              rotation-y={frontCoverRotation}
       >
-      <animated.group position={[0.5, 0, 0]}> {/* pivot over x back from parent */}
+      <animated.group position={[0.6, 0, 0]}> {/* pivot over x back from parent */}
         <mesh ref={frontCoverRef} position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
@@ -158,10 +186,9 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
         * to flip through with different rendered content
         * We would have to check so we can index the pages as key to
         * call specific animation on */}
-
-      <group ref={centerRef}>
-        <MultiplePages amount={4} z_origin={0.06} z_directed={-0.015}/>
-      </group>
+        <group ref={centerRef}>
+            <MultiplePages amount={4} z_origin={0.06} z_directed={-0.015}/>
+        </group>
 
       {/* Back Cover */}
       <group ref={backCoverGroupRef}>
