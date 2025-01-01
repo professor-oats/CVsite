@@ -61,9 +61,13 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   });
 
   // Spring animations for book opening
-  const { frontCoverRotation } = useSpring({
+  const { frontCoverRotation, spineRotation } = useSpring({
     frontCoverRotation: isOpened ? -Math.PI : 0, // Rotate the front cover to -180°
-    config: { tension: 180, friction: 100 },
+    spineRotation: isOpened ? Math.PI / 2 : 0,
+    config: (key) =>
+      key === 'frontCoverRotation'
+        ? { tension: 180, friction: 100 }
+        : { tension: 280, friction: 60 },
     onRest: () => {
       if (isOpened && onBookOpen) {
         onBookOpen(); // Notify parent when book is fully opened
@@ -85,7 +89,6 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   }, []);
 
   const startingPositionY = useRef(0); // Use a ref to store the initial Y position
-  const startingPositionZ = useRef(0); // This is for the backCoverZ
   const movingUp = useRef(true); // Track the movement direction
   const posMaxZ = useRef(0);
 
@@ -97,10 +100,6 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
     // Inits here
     if (bookRef.current && startingPositionY.current === 0) {
       startingPositionY.current = bookRef.current.position.y;
-    }
-
-    if (backCoverRef.current && startingPositionZ.current === 0) {
-      startingPositionZ.current = backCoverRef.current.position.z;
     }
 
     if (bookRef.current) {
@@ -133,12 +132,21 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
 
      * When we check the const ref posMaxZ we check the objects current value
      * that it is holding
+
+     * Funny how we test to animate with useFrame() and also useSpring()
+     * and we still go back to useFrame() ... The Spring wouldn't work,
+     * alas not needed.
      */
 
+    // After some animation bugs this just works, code is like piña colada
+    // with semantic error, but hey, if it works it works
     if (backCoverRef.current && posMaxZ.current <= 0.2 && isOpened) {
-      console.log("Here MF");
       posMaxZ.current += 0.002;
       backCoverRef.current.position.z = -posMaxZ.current;
+      centerRef.current.position.z = -posMaxZ.current;
+      if (posMaxZ.current <= 0.28) {
+        spineRef.current.position.z = -posMaxZ.current;
+      }
     }
   });
 
@@ -158,6 +166,15 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   return (
     <animated.group>
 
+      {/* Some needed notes here:
+        * When fiddling with Spring animations and useFrame() animation there seem
+        * to be a competition in position of their objects, thankfully they align
+        * painfully well together and if we want to be a good programmer we shall
+        * find the culprit of this.
+        * If this was done to a proper client
+        * we would have to.
+      */}
+
       {/* Front Cover */}
       {/* We will want to make another animated.group to parent the frontCoverGroupRef
         * so we can x-pivot the rotation-y */}
@@ -165,10 +182,10 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
       <animated.group ref={frontCoverGroupRef}
              onPointerOver={() => setIsBookHovered(true)} // Hover start
              onPointerOut={() => setIsBookHovered(false)} // Hover end
-             position={[-0.6, 0, 0]} // pivot-x
+             position={[-0.57, 0, 0]} // pivot-x
              rotation-y={frontCoverRotation}
       >
-      <animated.group position={[0.6, 0, 0]}> {/* pivot over x back from parent */}
+      <animated.group position={[0.57, 0, 0]}> {/* pivot over x back from parent */}
         <mesh ref={frontCoverRef} position={[0, 0, 0.2]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
@@ -205,9 +222,14 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
       </group>
 
         {/* spine */}
-      <mesh position={[-0.503, -0.75, 0.05 - spineOffsetZ]} rotation={[-Math.PI / 2, 0, 0]}>
+      <animated.mesh
+        ref={spineRef}
+        position={[-0.503, -0.75, 0.05 - spineOffsetZ]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        rotation-z={spineRotation}
+      >
         <ArcSpine spineColor={spineColor}/>
-      </mesh>
+      </animated.mesh>
 
         {/* Outline Effects */}
         {frontCoverRef?.current && !isOpened && (
