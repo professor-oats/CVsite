@@ -107,7 +107,8 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
       startingPositionY.current = bookRef.current.position.y;
     }
 
-    if (bookRef.current) {
+    // Using bool shouldRenderMiddlePages since it's eqvivalent to onRest opened
+    if (bookRef.current && shouldRenderMiddlePages) {
 
       if (movingUp.current) {
         bookRef.current.position.y += 0.0016;
