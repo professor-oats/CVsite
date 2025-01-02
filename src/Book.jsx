@@ -14,6 +14,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   const backCoverRef = useRef();
   const centerRef = useRef();
   const spineRef = useRef();
+  const callbackTriggered = useRef(false);
   const textures = useTextures();
 
   const [isBookHovered, setIsBookHovered] = useState(false);
@@ -27,7 +28,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
 
   const [spineColor, setSpineColor] = useState('black'); // Initial color
   const [spineOffsetZ, setSpineOffsetZ] = useState(0);
-  const [backCoverOffsetZ, setBackCoverOffsetZ] = useState(0);
+  const [spineOffsetX, setSpineOffsetX] = useState(0);
 
   const handleBookClick = () => {
     setShouldRenderMiddlePages(false);
@@ -38,6 +39,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
     const timer = setTimeout(() => {
       setSpineColor(isOpened ? 'beige' : 'black'); // Change color after delay
       setSpineOffsetZ(isOpened ? 0.13 : 0);  // Set offsetZ after delay
+      setSpineOffsetX(isOpened ? 0.07 : 0);
       //setBackCoverOffsetZ(isOpened ? 0.1 : 0);
     }, 300); // Delay in milliseconds (1 second in this case)
 
@@ -61,15 +63,18 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   });
 
   // Spring animations for book opening
-  const { frontCoverRotation, spineRotation } = useSpring({
-    frontCoverRotation: isOpened ? -Math.PI : 0, // Rotate the front cover to -180°
-    spineRotation: isOpened ? -Math.PI / 2 : 0,
+  const { frontCoverRotation, backCoverRotation, spineRotation } = useSpring({
+    frontCoverRotation: isOpened ? -Math.PI + 0.2 : 0, // Rotate the front cover to -Pi ish
+    backCoverRotation: isOpened ? -0.064 : 0,
+    spineRotation: isOpened ? -Math.PI / 2 + 0.08 : 0,
     config: (key) =>
       key === 'frontCoverRotation'
         ? { tension: 180, friction: 100 }
         : { tension: 280, friction: 60 },
     onRest: () => {
-      if (isOpened && onBookOpen) {
+      if (isOpened && onBookOpen && !callbackTriggered.current) {
+        callbackTriggered.current = true;
+        setShouldRenderMiddlePages(false);
         onBookOpen(); // Notify parent when book is fully opened
         // Acts as a callback to parent so we can use this conditionally
       }
@@ -140,12 +145,15 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
 
     // After some animation bugs this just works, code is like piña colada
     // with semantic error, but hey, if it works it works
-    if (backCoverRef.current && posMaxZ.current <= 0.2 && isOpened) {
+    if (backCoverRef.current && posMaxZ.current <= 0.18 && isOpened) {
       posMaxZ.current += 0.002;
       backCoverRef.current.position.z = -posMaxZ.current;
       centerRef.current.position.z = -posMaxZ.current;
-      if (posMaxZ.current <= 0.1) {
+      if (spineRef.current && posMaxZ.current <= 0.1) {
         spineRef.current.position.z = -posMaxZ.current;
+      }
+      if (frontCoverGroupRef.current && posMaxZ.current <= 0.032) {
+        frontCoverGroupRef.current.position.z = -posMaxZ.current;
       }
     }
   });
@@ -199,16 +207,14 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
       </animated.group>
       </animated.group>
 
-      {/* This is where the CV render will take place, like have four pages
-        * to flip through with different rendered content
-        * We would have to check so we can index the pages as key to
-        * call specific animation on */}
+        {/* Bulk of center pages, first thought to bring more animation base
+          * but opted out */}
         <group ref={centerRef}>
-            <MultiplePages amount={4} z_origin={0.06} z_directed={-0.015}/>
+          {shouldRenderMiddlePages && <MultiplePages amount={4} z_origin={0.06} z_directed={-0.015}/>}
         </group>
 
       {/* Back Cover */}
-      <group ref={backCoverGroupRef}>
+      <animated.group ref={backCoverGroupRef} rotation-y={backCoverRotation}>
         <mesh ref={backCoverRef} position={[0, 0, -0.1]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
           <meshStandardMaterial
@@ -219,12 +225,12 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
           />
           <MultiplePages z_origin={0.115} z_directed={-0.015}/>
         </mesh>
-      </group>
+      </animated.group>
 
         {/* spine */}
       <animated.mesh
         ref={spineRef}
-        position={[-0.503, -0.75, 0.05 - spineOffsetZ]}
+        position={[-0.503 -spineOffsetX, -0.75, 0.05 - spineOffsetZ]}
         rotation={[-Math.PI / 2, 0, 0]}
         rotation-z={spineRotation}
       >

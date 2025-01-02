@@ -125,6 +125,12 @@ const MainApp = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
+/* Alright ... now I realised that React.StrictMode
+ * affects the Render time and frames a lot due to its nature
+ * so now we will have to go through the animations once again
+ * when we are finished with the strict mode
+ */
+
 root.render(
   <React.StrictMode>
       <MainApp />
