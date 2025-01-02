@@ -24,6 +24,7 @@ import * as THREE from 'three';
 const MainApp = () => {
 
   const [showParticles, setShowParticles] = useState(true);
+  const [haveBloom, setHaveBloom] = useState(true);
 
   /* Having a general rotationSpring applied on animated.group in index.js gives less imports necessary
    * in the jsx files
@@ -41,84 +42,114 @@ const MainApp = () => {
 
   const handleBookOpen = () => {
     console.log('Book is open')
+    setShowParticles(false);
+    setHaveBloom(false);  {/* Turning this off really affects the color perceived.
+    * We may have to adjust the color of the pages or tinker with the light.
+    * Since light is part of index.js that can be the most simple upfront thing to do.
+    */}
   }
 
   return (
-  <div>
-    <div
-      style={{
-        position: "absolute",
-        top: "20px",
-        right: "20px",
-        zIndex: 1, // Ensure it's above the canvas
-      }}
-    >
-      <button
-        onClick={() => setShowParticles((prev) => !prev)}
+    <div>
+      {/* Start out with buttons */}
+      <div
         style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          border: "none",
-          borderRadius: "5px",
-          backgroundColor: showParticles ? "#ff4d4d" : "#4caf50",
-          color: "white",
-          cursor: "pointer",
+          position: "absolute",
+          top: "20px",
+          right: "200px",
+          zIndex: 1, // Ensure it's above the canvas
         }}
       >
-        {showParticles ? "Disable Particles" : "Enable Particles"}
-      </button>
-    </div>
+        <button
+          onClick={() => setHaveBloom((prev) => !prev)}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            border: "none",
+            borderRadius: "5px",
+            backgroundColor: haveBloom ? "#ff4d4d" : "#4caf50",
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          {haveBloom ? "Disable Bloom" : "Enable Bloom"}
+        </button>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: 1, // Ensure it's above the canvas
+        }}
+      >
+        <button
+          onClick={() => setShowParticles((prev) => !prev)}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            border: "none",
+            borderRadius: "5px",
+            backgroundColor: showParticles ? "#ff4d4d" : "#4caf50",
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          {showParticles ? "Disable Particles" : "Enable Particles"}
+        </button>
+      </div>
 
-  <TextureProvider>
-    <Canvas
-      camera={{
-        position: [0, 0, 8],  // Camera position
-        fov: 55,               // Field of view
-        near: 0.1,             // Near clipping plane
-        far: 1000,             // Far clipping plane
-        up: [0, 1, 0],         // Camera up vector
-      }}
-      style={{
-        position: "absolute", // Ensure Canvas fills the container
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      {/* Lighting */}
-      <ambientLight intensity={0}/>
-      <pointLight position={[0.4, 0.5, 2]} angle={0.25} penumbra={1} decay={0} intensity={Math.PI - 1}/>
-      <pointLight position={[-5, -5, -5]} decay={0} intensity={3}/>
-      <pointLight position={[-4, -2, 1]} angle={0.25} penumbra={1} decay={0} intensity={2}/>
+      <TextureProvider>
+        <Canvas
+          camera={{
+            position: [0, 0, 8],  // Camera position
+            fov: 55,               // Field of view
+            near: 0.1,             // Near clipping plane
+            far: 1000,             // Far clipping plane
+            up: [0, 1, 0],         // Camera up vector
+          }}
+          style={{
+            position: "absolute", // Ensure Canvas fills the container
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          {/* Lighting */}
+          <ambientLight intensity={0}/>
+          <pointLight position={[0.4, 0.5, 2]} angle={0.25} penumbra={1} decay={0} intensity={Math.PI - 1}/>
+          <pointLight position={[-5, -5, -5]} decay={0} intensity={3}/>
+          <pointLight position={[-4, -2, 1]} angle={0.25} penumbra={1} decay={0} intensity={2}/>
 
-        {/* 3D Components */}
-        <OrbitControls/>
-        {/* Wanted to test out to have BloomProvider context to only allow bloom render of elements
+          {/* 3D Components */}
+          <OrbitControls/>
+          {/* Wanted to test out to have BloomProvider context to only allow bloom render of elements
         * inside this, however I opt for the solution to only have one render and EffectComposer adds
         * bloom to whole scene when used in one render. We got a good scene when turning off the
         * ambientLight */}
 
-        {/* Ditch the Bloom as soon as we have the book open perhaps */}
-        <BloomProvider>
-          <EffectComposer>
-            <Bloom
-              intensity={4.0}  // Adjust intensity of the bloom effect - - - MAX it baby
-              width={500}  // Resolution width for bloom
-              height={500} // Resolution height for bloom
-              kernelSize={2} // Bloom size, adjust as needed
-            />
-          </EffectComposer>
-        </BloomProvider>
-      {showParticles && <ParticleBeams innerRadius={0.8} outerRadius={1.8}/>}
-        <Book
-          setFrontCoverRef={setFrontCoverRef}
-          setBackCoverRef={setBackCoverRef}
-          onBookOpen={handleBookOpen}
-        />
-      </Canvas>
-    </TextureProvider>
-  </div>
+          {/* Ditch the Bloom as soon as we have the book open perhaps */}
+          {/* Bloom seem to be a real resource hogger, we also add button to turn it off */}
+          {haveBloom && <BloomProvider>
+            <EffectComposer>
+              <Bloom
+                intensity={4.0}  // Adjust intensity of the bloom effect - - - MAX it baby
+                width={500}  // Resolution width for bloom
+                height={500} // Resolution height for bloom
+                kernelSize={2} // Bloom size, adjust as needed
+              />
+            </EffectComposer>
+          </BloomProvider>}
+          {showParticles && <ParticleBeams innerRadius={0.8} outerRadius={1.8}/>}
+          <Book
+            setFrontCoverRef={setFrontCoverRef}
+            setBackCoverRef={setBackCoverRef}
+            onBookOpen={handleBookOpen}
+          />
+        </Canvas>
+      </TextureProvider>
+    </div>
   );
 };
 
@@ -133,6 +164,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
-      <MainApp />
+    <MainApp/>
   </React.StrictMode>
 );
