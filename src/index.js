@@ -26,16 +26,6 @@ const MainApp = () => {
   const [showParticles, setShowParticles] = useState(true);
   const [haveBloom, setHaveBloom] = useState(true);
 
-  /* Having a general rotationSpring applied on animated.group in index.js gives less imports necessary
-   * in the jsx files
-   * !!! Thinking of it a second time it may end up in multiple rotation renders so I'd rather use
-   * imports in each JSX file that need them ...
-   */
-  const rotationSpring = useSpring({
-    rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32], // Rotation: x (tilt), y (45°), z
-    config: { duration: 0 }, // Static, no animation
-  });
-
   // Access the bookRef from our Book.jsx
   const [frontCoverRef, setFrontCoverRef] = useState(null);
   const [backCoverRef, setBackCoverRef] = useState(null);
@@ -60,16 +50,10 @@ const MainApp = () => {
           zIndex: 1, // Ensure it's above the canvas
         }}
       >
-        <button
+        <button className={'plebButton'}
           onClick={() => setHaveBloom((prev) => !prev)}
           style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            border: "none",
-            borderRadius: "5px",
             backgroundColor: haveBloom ? "#ff4d4d" : "#4caf50",
-            color: "white",
-            cursor: "pointer",
           }}
         >
           {haveBloom ? "Disable Bloom" : "Enable Bloom"}
@@ -83,16 +67,10 @@ const MainApp = () => {
           zIndex: 1, // Ensure it's above the canvas
         }}
       >
-        <button
+        <button className={'plebButton'}
           onClick={() => setShowParticles((prev) => !prev)}
           style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            border: "none",
-            borderRadius: "5px",
             backgroundColor: showParticles ? "#ff4d4d" : "#4caf50",
-            color: "white",
-            cursor: "pointer",
           }}
         >
           {showParticles ? "Disable Particles" : "Enable Particles"}
@@ -125,11 +103,12 @@ const MainApp = () => {
           {/* 3D Components */}
           <OrbitControls/>
           {/* Wanted to test out to have BloomProvider context to only allow bloom render of elements
-        * inside this, however I opt for the solution to only have one render and EffectComposer adds
-        * bloom to whole scene when used in one render. We got a good scene when turning off the
-        * ambientLight */}
+            * inside this, however, since that would take double post-renders,
+            * I opt for the solution to only have one render and EffectComposer adds
+            * bloom to whole scene.
+            */}
 
-          {/* Ditch the Bloom as soon as we have the book open perhaps */}
+          {/* Ditch the Bloom as soon as we have the book open */}
           {/* Bloom seem to be a real resource hogger, we also add button to turn it off */}
           {haveBloom && <BloomProvider>
             <EffectComposer>
@@ -160,7 +139,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
  * affects the Render time and frames a lot due to its nature
  * so now we will have to go through the animations once again
  * when we are finished with the strict mode
- */
+ *
+ * Addition: This is most/only noticeable when Bloom is activated
+ * */
 
 root.render(
   <React.StrictMode>

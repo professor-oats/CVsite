@@ -7,8 +7,8 @@ import { useTextures } from './TextureContext';
 import OutlineEffect from "./OutlineEffect";
 
 const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
-  const bookRef = useRef(); // Reference for the entire book
-  const frontCoverGroupRef = useRef(); // Reference for the front cover
+  const bookRef = useRef();
+  const frontCoverGroupRef = useRef();
   const frontCoverRef = useRef();
   const backCoverGroupRef = useRef();
   const backCoverRef = useRef();
@@ -19,12 +19,12 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
 
   const [isBookHovered, setIsBookHovered] = useState(false);
 
-  // Define the hover scale multiplier
+  // Define the hover scale multiplier passed to the custom glow shader
   const hoverBookScaleMultiplier = isBookHovered ? 1.4 : 1.2; // Adjust as seeing fit
 
   // State for book opening
   const [isOpened, setIsOpened] = useState(false);
-  const [shouldRenderMiddlePages, setShouldRenderMiddlePages] = useState(true); // Lol
+  const [shouldRenderMiddlePages, setShouldRenderMiddlePages] = useState(true);
 
   const [spineColor, setSpineColor] = useState('black'); // Initial color
   const [spineOffsetZ, setSpineOffsetZ] = useState(0);
