@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Book from './Book';
 import ParticleBeams from './ParticleBeams';
-import { Canvas, useThree } from "@react-three/fiber";
-import { Text } from '@react-three/drei';
+import {Canvas, useFrame, useThree} from "@react-three/fiber";
+import {Text, useCamera} from '@react-three/drei';
 import { OrbitControls } from '@react-three/drei';
 import './styles.css'
 import { TextureProvider } from "./TextureContext";
@@ -11,8 +11,6 @@ import { BloomProvider } from './BloomContext';
 import { EffectComposer, Bloom, Outline } from '@react-three/postprocessing';
 import { animated, useSpring } from "@react-spring/three";
 import {useState, useEffect, useRef} from "react";
-import { useFrame } from '@react-three/fiber';
-
 /* Note:
  * Adding bloom effect as a post render to certain elements is a very hacky way
  * to gain a more intense emission ... One other approach could be to clump more particles
@@ -33,7 +31,8 @@ const MainApp = () => {
   const [frontCoverRef, setFrontCoverRef] = useState(null);
   const [backCoverRef, setBackCoverRef] = useState(null);
 
-  const cameraRef = useRef();
+  const cameraRef = useRef(null);
+  const posMaxZ = useRef(9);  // The initial camera.position.z
 
   // See if these current calls will be performant enough
   useEffect(() => {
@@ -44,7 +43,7 @@ const MainApp = () => {
       cameraRef.current.far = 1000; // Far clipping plane
       cameraRef.current.position.set(0, 0, 9); // Initial position
       cameraRef.current.up.set(0, 1, 0); // Camera up vector
-      cameraRef.current.updateProjectionMatrix(); // Apply changes
+      cameraRef.current.updateProjectionMatrix(); // Apply changes - Not always needed
     }
   }, []);
 
@@ -58,6 +57,17 @@ const MainApp = () => {
     setIsOpened(true);
   }
 
+  // Nice. We have movement now, we'd like it to accelerate also
+  const CameraAnimation = () => {
+    useFrame(() => {
+      if (cameraRef.current && isOpened && posMaxZ.current >= 2.0) {
+        posMaxZ.current -= 0.04
+        cameraRef.current.position.z = posMaxZ.current;
+        //cameraRef.current.updateProjectionMatrix();
+      }
+    })
+  }
+
   // Have to wrap useSpring() and useFrame() into a component since
   // they can only be hooked in <Canvas>
 
@@ -68,7 +78,7 @@ const MainApp = () => {
   // Defining the THREE js objects scene and camera as their own
   // separate components, things are getting bolognese here.
 
-  // For unkown reason we hit more GPU/CPU load once we made them
+  // For unknown reason we hit more GPU/CPU load once we made them
   // into separate components. Gotta fiddle with that why.
   // Is it because the default Canvas camera is combating when
   // MyCamera checks for current.updates against it?
@@ -130,12 +140,14 @@ const MainApp = () => {
             width: "100%",
             height: "100%",
           }}
-          camera={{ position: [0, 0, 9], fov: 55 }}
+          camera={{ position: [0, 0, 9], fov: 55  }}
           onCreated={({ camera }) => {
-            cameraRef.current = camera; // Setting the Canvas camera to our ref
+            cameraRef.current = camera; // Passing the Canvas camera to our ref
             // so we can manip
           }}
         >
+            {/* Camera */}
+          <CameraAnimation/>
             {/* Lighting */}
             <ambientLight intensity={0}/>
             <pointLight position={[0.4, 0.5, 2]} angle={0.25} penumbra={1} decay={0} intensity={Math.PI - 1}/>
