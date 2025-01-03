@@ -11,6 +11,8 @@ import { BloomProvider } from './BloomContext';
 import { EffectComposer, Bloom, Outline } from '@react-three/postprocessing';
 import { animated, useSpring } from "@react-spring/three";
 import {useState, useEffect, useRef} from "react";
+import * as THREE from "three";
+
 /* Note:
  * Adding bloom effect as a post render to certain elements is a very hacky way
  * to gain a more intense emission ... One other approach could be to clump more particles
@@ -33,6 +35,8 @@ const MainApp = () => {
 
   const cameraRef = useRef(null);
   const posMaxZ = useRef(9);  // The initial camera.position.z
+  const accelerationZ = useRef(0);
+  const lookMaxX = useRef(0);
 
   // See if these current calls will be performant enough
   useEffect(() => {
@@ -58,11 +62,23 @@ const MainApp = () => {
   }
 
   // Nice. We have movement now, we'd like it to accelerate also
+  // acceleration goochie
+  // Now we only have to fix the book or camera tilt
+
   const CameraAnimation = () => {
+
     useFrame(() => {
+      accelerationZ.current += 0.001;
+      console.log(lookMaxX.current);
       if (cameraRef.current && isOpened && posMaxZ.current >= 2.0) {
-        posMaxZ.current -= 0.04
+        posMaxZ.current = posMaxZ.current - (0.03 + accelerationZ.current);
         cameraRef.current.position.z = posMaxZ.current;
+        //cameraRef.current.updateProjectionMatrix();
+      }
+      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && lookMaxX.current <= 0.94) {
+        lookMaxX.current = lookMaxX.current + 0.03;
+        const targetX = -lookMaxX.current;
+        cameraRef.current.lookAt(targetX, 0, 0)
         //cameraRef.current.updateProjectionMatrix();
       }
     })
