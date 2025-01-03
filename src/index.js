@@ -10,8 +10,10 @@ import { TextureProvider } from "./TextureContext";
 import { BloomProvider } from './BloomContext';
 import { EffectComposer, Bloom, Outline } from '@react-three/postprocessing';
 import { animated, useSpring } from "@react-spring/three";
-import {useState, useEffect} from "react";
-import * as THREE from 'three';
+import {useState, useEffect, useRef} from "react";
+import { useFrame } from '@react-three/fiber';
+import MyScene from './MyScene'
+import MyCamera from './MyCamera.jsx'
 
 /* Note:
  * Adding bloom effect as a post render to certain elements is a very hacky way
@@ -25,19 +27,42 @@ const MainApp = () => {
 
   const [showParticles, setShowParticles] = useState(true);
   const [haveBloom, setHaveBloom] = useState(true);
+  const [isOpened, setIsOpened] = useState(false);
 
   // Access the bookRef from our Book.jsx
   const [frontCoverRef, setFrontCoverRef] = useState(null);
   const [backCoverRef, setBackCoverRef] = useState(null);
 
-  const handleBookOpen = () => {
-    console.log('Book is open')
+  const cameraRef = useRef();
+
+  const handleBookOpened = () => {
+    console.log('Book is opened')
     setShowParticles(false);
-    setHaveBloom(false);  {/* Turning this off really affects the color perceived.
+    setHaveBloom(false);  /* Turning this off really affects the color perceived.
     * We may have to adjust the color of the pages or tinker with the light.
     * Since light is part of index.js that can be the most simple upfront thing to do.
-    */}
+    */
+    setIsOpened(true);
   }
+
+  // Have to wrap useSpring() and useFrame() into a component since
+  // they can only be hooked in <Canvas>
+
+  // gsap is generally good at this but if we can go without
+  // extra depend it can be coolios
+
+  // Guess it's time to do what we should have in the beginning:
+  // Defining the THREE js objects scene and camera as their own
+  // separate components, things are getting bolognese here.
+
+  // For unkown reason we hit more GPU/CPU load once we made them
+  // into separate components. Gotta fiddle with that why.
+  // Is it because the default Canvas camera is combating when
+  // MyCamera checks for current.updates against it?
+
+  // Checking on the options to render things outside of React and do useEffect()
+  // do add things and it's really not what we would like. I want to have a good performance usage so
+  // I will see what we can do
 
   return (
     <div>
@@ -79,13 +104,6 @@ const MainApp = () => {
 
       <TextureProvider>
         <Canvas
-          camera={{
-            position: [0, 0, 8],  // Camera position
-            fov: 55,               // Field of view
-            near: 0.1,             // Near clipping plane
-            far: 1000,             // Far clipping plane
-            up: [0, 1, 0],         // Camera up vector
-          }}
           style={{
             position: "absolute", // Ensure Canvas fills the container
             top: 0,
@@ -94,38 +112,39 @@ const MainApp = () => {
             height: "100%",
           }}
         >
-          {/* Lighting */}
-          <ambientLight intensity={0}/>
-          <pointLight position={[0.4, 0.5, 2]} angle={0.25} penumbra={1} decay={0} intensity={Math.PI - 1}/>
-          <pointLight position={[-5, -5, -5]} decay={0} intensity={3}/>
-          <pointLight position={[-4, -2, 1]} angle={0.25} penumbra={1} decay={0} intensity={2}/>
+          <MyScene>
+            <MyCamera position={isOpened ? [0, 0, 2] : [0, 0, 9]} />
+            {/* Lighting */}
+            <ambientLight intensity={0}/>
+            <pointLight position={[0.4, 0.5, 2]} angle={0.25} penumbra={1} decay={0} intensity={Math.PI - 1}/>
+            <pointLight position={[-5, -5, -5]} decay={0} intensity={3}/>
+            <pointLight position={[-4, -2, 1]} angle={0.25} penumbra={1} decay={0} intensity={2}/>
 
-          {/* 3D Components */}
-          <OrbitControls/>
-          {/* Wanted to test out to have BloomProvider context to only allow bloom render of elements
-            * inside this, however, since that would take double post-renders,
-            * I opt for the solution to only have one render and EffectComposer adds
-            * bloom to whole scene.
-            */}
+            {/* Wanted to test out to have BloomProvider context to only allow bloom render of elements
+              * inside this, however, since that would take double post-renders,
+              * I opt for the solution to only have one render and EffectComposer adds
+              * bloom to whole scene.
+              */}
 
-          {/* Ditch the Bloom as soon as we have the book open */}
-          {/* Bloom seem to be a real resource hogger, we also add button to turn it off */}
-          {haveBloom && <BloomProvider>
-            <EffectComposer>
-              <Bloom
-                intensity={4.0}  // Adjust intensity of the bloom effect - - - MAX it baby
-                width={500}  // Resolution width for bloom
-                height={500} // Resolution height for bloom
-                kernelSize={2} // Bloom size, adjust as needed
-              />
-            </EffectComposer>
-          </BloomProvider>}
-          {showParticles && <ParticleBeams innerRadius={0.8} outerRadius={1.8}/>}
-          <Book
-            setFrontCoverRef={setFrontCoverRef}
-            setBackCoverRef={setBackCoverRef}
-            onBookOpen={handleBookOpen}
-          />
+            {/* Ditch the Bloom as soon as we have the book open */}
+            {/* Bloom seem to be a real resource hogger, we also add button to turn it off */}
+            {haveBloom && <BloomProvider>
+              <EffectComposer>
+                <Bloom
+                  intensity={4.0}  // Adjust intensity of the bloom effect - - - MAX it baby
+                  width={500}  // Resolution width for bloom
+                  height={500} // Resolution height for bloom
+                  kernelSize={2} // Bloom size, adjust as needed
+                />
+              </EffectComposer>
+            </BloomProvider>}
+            {showParticles && <ParticleBeams innerRadius={0.8} outerRadius={1.8}/>}
+            <Book
+              setFrontCoverRef={setFrontCoverRef}
+              setBackCoverRef={setBackCoverRef}
+              onBookOpened={handleBookOpened}
+            />
+          </MyScene>
         </Canvas>
       </TextureProvider>
     </div>
