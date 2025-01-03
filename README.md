@@ -11,6 +11,7 @@ What has been realised so far is that even that it was a neat idea <br />
 to write this with React in the beginning, with the modular approach of having <br />
 separate components, it really started to affect some performance when queueing up <br />
 React's handling of elements to THREE.js object updates. <br />
+<br />
 Note: This was realised when I wanted the camera updates applied to fiber Canvas through its <br />
 own component, and I switched back to have it directly referenced into Canvas <br /> 
 <br />
