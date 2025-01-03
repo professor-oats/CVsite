@@ -12,8 +12,6 @@ import { EffectComposer, Bloom, Outline } from '@react-three/postprocessing';
 import { animated, useSpring } from "@react-spring/three";
 import {useState, useEffect, useRef} from "react";
 import { useFrame } from '@react-three/fiber';
-import MyScene from './MyScene'
-import MyCamera from './MyCamera.jsx'
 
 /* Note:
  * Adding bloom effect as a post render to certain elements is a very hacky way
@@ -34,6 +32,19 @@ const MainApp = () => {
   const [backCoverRef, setBackCoverRef] = useState(null);
 
   const cameraRef = useRef();
+
+  // See if these current calls will be performant enough
+  useEffect(() => {
+    if (cameraRef.current) {
+      // Set camera properties
+      cameraRef.current.fov = 55; // Field of view
+      cameraRef.current.near = 0.1; // Near clipping plane
+      cameraRef.current.far = 1000; // Far clipping plane
+      cameraRef.current.position.set(0, 0, 10); // Initial position
+      cameraRef.current.up.set(0, 1, 0); // Camera up vector
+      cameraRef.current.updateProjectionMatrix(); // Apply changes
+    }
+  }, []);
 
   const handleBookOpened = () => {
     console.log('Book is opened')
@@ -62,7 +73,13 @@ const MainApp = () => {
 
   // Checking on the options to render things outside of React and do useEffect()
   // do add things and it's really not what we would like. I want to have a good performance usage so
-  // I will see what we can do
+  // I will see what we can do:
+  // Going back to using the Canvas camera to limit the current calls
+
+  // Fun thing:
+  // I realise the performance hit thanks to listening to the fans of the
+  // older hardware I currently use. Can be good practice to further on
+  // check this with software when I have upgraded.
 
   return (
     <div>
@@ -111,9 +128,11 @@ const MainApp = () => {
             width: "100%",
             height: "100%",
           }}
+          camera={{ position: [0, 0, 10], fov: 55 }}
+          onCreated={({ camera }) => {
+            cameraRef.current = camera; // Assign Canvas camera to ref
+          }}
         >
-          <MyScene>
-            <MyCamera position={isOpened ? [0, 0, 2] : [0, 0, 9]} />
             {/* Lighting */}
             <ambientLight intensity={0}/>
             <pointLight position={[0.4, 0.5, 2]} angle={0.25} penumbra={1} decay={0} intensity={Math.PI - 1}/>
@@ -144,7 +163,6 @@ const MainApp = () => {
               setBackCoverRef={setBackCoverRef}
               onBookOpened={handleBookOpened}
             />
-          </MyScene>
         </Canvas>
       </TextureProvider>
     </div>

@@ -22,10 +22,8 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
     config: { duration: 0 }, // Static, no animation
   });
 
-  // NOTE: Currently we have a wider spread of particles at the former frames
-  // and progressively they tighten up. We should check the t and some other things
-
   // Update: Ugliest particle system I have made, also the first ...
+  // But we will cheat with camera angle, Tinder style
 
   // INITIALIZE PARTICLES
 
@@ -51,6 +49,9 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       // translate over the radial space, we may want to add an offsetY too,
       // we'll play a little
 
+      // Update:
+      // We didn't use this bound at all, we just plebbed through randomness everywhere
+
       // Seems like this Math.random here can be played with to generate different flow
       // behaviour - - - default: - 0.5, generally it affects the perceived spread
       // which is good to know
@@ -60,15 +61,22 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
       // NOTE: WE SHOULD actually go through the initialization since the look of it differs
       // very much from the useFrame() update, however, looks kind of cool so we can settle for now
       // took some time to differentiate between the initiliazation vs. update on frame
-      // for some reason I though the init values and it's functions persisted ... brain rot skibidi
+      // for some reason I thought the init values and it's functions persisted ... brain rot skibidi
 
       // Set positions - - - Tinker these values to gain the beam look that we want
       // To gain a more authentic glow experience we would like to have a wider spread
       // In the start of the t value and also a higher particle density there for balance
       // We also want to manage the particle size and velocity to start gaining actual light beams
 
+      // Update:
+      // We didn't gain any glow from this, it just added a sprinkled atmosphere
+      // I wrote a shader for the glow effect instead
+
       // Update 18/12, not fully satisfied with init pos but think I have to settle
       // for time efficiency
+
+      // Update:
+      // Camera angle is king
 
       positions[index] = radius * dirX + offsetX * 2 * (Math.random() -0.5) * 100 + 1;   // x
       positions[index + 1] = (Math.random() - 0.5) * 2; // y
@@ -96,11 +104,9 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
     // so we will want to have either a useState or update it properly on the frames.
     // The particle initilization becomes less and less useful lol.
 
-    const smallBound = 0.5
-    const largeBound = 0.2
-    const currentBound = smallBound + radius * (largeBound - smallBound);
-
-    // I guess we lerp them over the radius, lerp on lerp = lol
+    // const smallBound = 0.5
+    // const largeBound = 0.2
+    // const currentBound = smallBound + radius * (largeBound - smallBound);
 
     for (let i = 0; i < positions.length / 3; i++) {
       positions[i * 3] += velocities[i * 3] * timeStep;     // X
@@ -132,15 +138,15 @@ const ParticleBeams = ({innerRadius=1, outerRadius=2}) => {
 
   });
 
-  // Alright, we have out wanted rotation. Now we just have to add a slight position
+  // Alright, we have our wanted rotation. Now we just have to add a slight position
   // fronting to the Spring to go better with our scene
 
   return (
     <animated.group position={beamSpring.position} rotation={beamSpring.rotation}>
     <points ref={particlesRef}>
       <bufferGeometry>
-        {/* As far as I understand it bufferGeomtry already instances a matrix on what to render
-          * on the buffer (bufferAttributes) to avoid unecessary GPU calls. So making an extra instancing may just
+        {/* As far as I understand it bufferGeometry already instances a matrix on what to render
+          * on the buffer (bufferAttributes) to avoid unnecessary GPU calls. So making an extra instancing may just
           * be redundant */}
         <bufferAttribute
           attach="attributes-position"
