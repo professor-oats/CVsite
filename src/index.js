@@ -21,6 +21,8 @@ import { useFrame } from '@react-three/fiber';
  * lighting
  */
 
+/* Starting to hit silly amount of hours spent on this project ... */
+
 const MainApp = () => {
 
   const [showParticles, setShowParticles] = useState(true);
@@ -40,7 +42,7 @@ const MainApp = () => {
       cameraRef.current.fov = 55; // Field of view
       cameraRef.current.near = 0.1; // Near clipping plane
       cameraRef.current.far = 1000; // Far clipping plane
-      cameraRef.current.position.set(0, 0, 10); // Initial position
+      cameraRef.current.position.set(0, 0, 9); // Initial position
       cameraRef.current.up.set(0, 1, 0); // Camera up vector
       cameraRef.current.updateProjectionMatrix(); // Apply changes
     }
@@ -128,9 +130,10 @@ const MainApp = () => {
             width: "100%",
             height: "100%",
           }}
-          camera={{ position: [0, 0, 10], fov: 55 }}
+          camera={{ position: [0, 0, 9], fov: 55 }}
           onCreated={({ camera }) => {
-            cameraRef.current = camera; // Assign Canvas camera to ref
+            cameraRef.current = camera; // Setting the Canvas camera to our ref
+            // so we can manip
           }}
         >
             {/* Lighting */}

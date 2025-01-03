@@ -6,7 +6,7 @@ import ArcSpine from "./ArcSpine";
 import { useTextures } from './TextureContext';
 import OutlineEffect from "./OutlineEffect";
 
-const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
+const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => {
   const bookRef = useRef();
   const frontCoverGroupRef = useRef();
   const frontCoverRef = useRef();
@@ -14,7 +14,8 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   const backCoverRef = useRef();
   const centerRef = useRef();
   const spineRef = useRef();
-  const callbackTriggered = useRef(false);
+  const callbackOpenTriggered = useRef(false);
+  const callbackOpenedTriggered = useRef(false);
   const textures = useTextures();
 
   const [isBookHovered, setIsBookHovered] = useState(false);
@@ -33,6 +34,10 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   const handleBookClick = () => {
     setShouldRenderMiddlePages(false);
     setIsOpened(true); // Toggle the book open state
+    if (isOpened && onBookOpen && !callbackOpenTriggered.current) {
+      callbackOpenTriggered.current = true;
+      onBookOpen(); // Notify parent when book is clicked/about to open
+    }
   };
 
   useEffect(() => {
@@ -72,10 +77,10 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
         ? { tension: 180, friction: 100 }
         : { tension: 280, friction: 60 },
     onRest: () => {
-      if (isOpened && onBookOpen && !callbackTriggered.current) {
-        callbackTriggered.current = true;
+      if (isOpened && onBookOpened && !callbackOpenedTriggered.current) {
+        callbackOpenedTriggered.current = true;
         setShouldRenderMiddlePages(false);
-        onBookOpen(); // Notify parent when book is fully opened
+        onBookOpened(); // Notify parent when book is fully opened
         // Acts as a callback to parent so we can use this conditionally
       }
     },
@@ -173,7 +178,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen}) => {
   // Will we have to set a position origin for the animated group perhaps?
   // kind of abusing that the default position is [0,0,0] here
   return (
-    <animated.group>
+    <animated.group position={[-0.18, 0, 0]}> {/* Mini adjust to align with particles better */}
 
       {/* Some needed notes here:
         * When fiddling with Spring animations and useFrame() animation there seem
