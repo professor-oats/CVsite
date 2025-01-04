@@ -84,23 +84,23 @@ const MainApp = () => {
       accelerationZ.current += 0.001;
       console.log(posMaxZ.current);
       if (cameraRef.current && isOpened && posMaxZ.current >= 1.6) {
-        posMaxZ.current = posMaxZ.current - (0.03 + accelerationZ.current);
+        posMaxZ.current = Math.max(1.6, posMaxZ.current - (0.03 + accelerationZ.current));
         cameraRef.current.position.z = posMaxZ.current;
         //cameraRef.current.updateProjectionMatrix();
       }
-      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && lookMaxX.current <= 1.0) {
-        lookMaxX.current = lookMaxX.current + 0.03;
+      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && lookMaxX.current <= 0.8) {
+        lookMaxX.current = Math.min(0.8, lookMaxX.current + 0.03);
         const targetX = -lookMaxX.current;
         const targetY = targetX + 0.8;
         cameraRef.current.lookAt(targetX, targetY, 0);
         //cameraRef.current.updateProjectionMatrix();
       }
-      if (cameraRef.current && isOpened && posMaxZ.current >= 8.9 && posMaxX.current <= 0.0) {
-        posMaxX.current = posMaxX.current + 0.03;
+      if (cameraRef.current && isOpened && posMaxZ.current >= 8.9 && posMaxX.current <= 0.2) {
+        posMaxX.current = Math.min(0.2, posMaxX.current + 0.03);
         cameraRef.current.position.x = posMaxX.current;
       }
-      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && posMaxY.current <= 0.6) {
-        posMaxY.current = posMaxY.current + 0.03;
+      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && posMaxY.current <= 0.8) {
+        posMaxY.current = Math.min(0.8, posMaxY.current + 0.03);
         cameraRef.current.position.y = posMaxY.current;
       }
 

@@ -64,15 +64,16 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
   // if we wanted to make some more animation.
   // This anim right now works as helper values for the camera anim ...
   // Thankfully project will be done before complete lasagna
+  // MMMMM LASAGNA, gotta love the realtime update on this one
   const bookSpring = useSpring({
-    rotation: isOpened ? [-Math.PI / 16 - 0.00, Math.PI / 8, Math.PI / 32] : [-Math.PI / 16, Math.PI / 8, Math.PI / 32] ,
+    rotation: isOpened ? [-Math.PI / 16 - 0.2, Math.PI / 8, Math.PI / 32 + 0.078] : [-Math.PI / 16, Math.PI / 8, Math.PI / 32] ,
     config: { tension: 180, friction: 100 }, // Static, no animation
   });
 
   // Spring animations for book opening
   const { frontCoverRotation, backCoverRotation, spineRotation } = useSpring({
-    frontCoverRotation: isOpened ? -Math.PI + 0.2 : 0, // Rotate the front cover to -Pi ish
-    backCoverRotation: isOpened ? -0.064 : 0,
+    frontCoverRotation: isOpened ? -Math.PI + 0.22 : 0, // Rotate the front cover to -Pi ish
+    backCoverRotation: isOpened ? -0.062 : 0,
     spineRotation: isOpened ? -Math.PI / 2 + 0.08 : 0,
     config: (key) =>
       key === 'frontCoverRotation'
