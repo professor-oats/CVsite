@@ -62,9 +62,11 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
 
   // Sleezy way of setting a static rotation but tested to have a Spring going
   // if we wanted to make some more animation.
+  // This anim right now works as helper values for the camera anim ...
+  // Thankfully project will be done before complete lasagna
   const bookSpring = useSpring({
-    rotation: [-Math.PI / 16, Math.PI / 8, Math.PI / 32],
-    config: { duration: 0 }, // Static, no animation
+    rotation: isOpened ? [-Math.PI / 16 - 0.00, Math.PI / 8, Math.PI / 32] : [-Math.PI / 16, Math.PI / 8, Math.PI / 32] ,
+    config: { tension: 180, friction: 100 }, // Static, no animation
   });
 
   // Spring animations for book opening

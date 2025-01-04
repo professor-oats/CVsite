@@ -33,10 +33,15 @@ const MainApp = () => {
   const [frontCoverRef, setFrontCoverRef] = useState(null);
   const [backCoverRef, setBackCoverRef] = useState(null);
 
+  // Kids, don't do this
+  // We will be looksmaxxing this one, get the mewing going
   const cameraRef = useRef(null);
+  const posMaxX = useRef(0);
+  const lookMaxX = useRef(0);
+  const posMaxY = useRef(0);
+  const lookMaxY = useRef(0);
   const posMaxZ = useRef(9);  // The initial camera.position.z
   const accelerationZ = useRef(0);
-  const lookMaxX = useRef(0);
 
   // See if these current calls will be performant enough
   useEffect(() => {
@@ -64,23 +69,41 @@ const MainApp = () => {
   // Nice. We have movement now, we'd like it to accelerate also
   // acceleration goochie
   // Now we only have to fix the book or camera tilt
+  // Power of manual animation on frame ...
+  // the .current.updateProjectionMatrix() is generally most needed
+  // when updates to the fov, near, and close values.
 
+  // Kids, don't do this ... use an animation library as any sane person would do
+  // No care for clamping, we'll use any overshoot anyway
+
+  // Never mind, the overshoot is painfully noticeable and gives different results
+  // on multiple runs.
   const CameraAnimation = () => {
 
     useFrame(() => {
       accelerationZ.current += 0.001;
-      console.log(lookMaxX.current);
-      if (cameraRef.current && isOpened && posMaxZ.current >= 2.0) {
+      console.log(posMaxZ.current);
+      if (cameraRef.current && isOpened && posMaxZ.current >= 1.6) {
         posMaxZ.current = posMaxZ.current - (0.03 + accelerationZ.current);
         cameraRef.current.position.z = posMaxZ.current;
         //cameraRef.current.updateProjectionMatrix();
       }
-      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && lookMaxX.current <= 0.94) {
+      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && lookMaxX.current <= 1.0) {
         lookMaxX.current = lookMaxX.current + 0.03;
         const targetX = -lookMaxX.current;
-        cameraRef.current.lookAt(targetX, 0, 0)
+        const targetY = targetX + 0.8;
+        cameraRef.current.lookAt(targetX, targetY, 0);
         //cameraRef.current.updateProjectionMatrix();
       }
+      if (cameraRef.current && isOpened && posMaxZ.current >= 8.9 && posMaxX.current <= 0.0) {
+        posMaxX.current = posMaxX.current + 0.03;
+        cameraRef.current.position.x = posMaxX.current;
+      }
+      if (cameraRef.current && isOpened && posMaxZ.current <= 8.9 && posMaxY.current <= 0.6) {
+        posMaxY.current = posMaxY.current + 0.03;
+        cameraRef.current.position.y = posMaxY.current;
+      }
+
     })
   }
 
@@ -112,7 +135,7 @@ const MainApp = () => {
   return (
     <div>
       {/* Start out with buttons */}
-      <div
+      {!isOpened && <div
         style={{
           position: "absolute",
           top: "20px",
@@ -128,8 +151,8 @@ const MainApp = () => {
         >
           {haveBloom ? "Disable Bloom" : "Enable Bloom"}
         </button>
-      </div>
-      <div
+      </div> }
+      {!isOpened && <div
         style={{
           position: "absolute",
           top: "20px",
@@ -145,7 +168,7 @@ const MainApp = () => {
         >
           {showParticles ? "Disable Particles" : "Enable Particles"}
         </button>
-      </div>
+      </div> }
 
       <TextureProvider>
         <Canvas
