@@ -5,7 +5,10 @@ import MultiplePages from "./PagesMultiple";
 import ArcSpine from "./ArcSpine";
 import { useTextures } from './TextureContext';
 import OutlineEffect from "./OutlineEffect";
+import {Text, Image} from '@react-three/drei';
+import winside from './assets/fonts/winsideuz.regular.ttf';
 
+// Any good book has references you know ...
 const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => {
   const bookRef = useRef();
   const frontCoverGroupRef = useRef();
@@ -30,6 +33,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
   const [spineColor, setSpineColor] = useState('black'); // Initial color
   const [spineOffsetZ, setSpineOffsetZ] = useState(0);
   const [spineOffsetX, setSpineOffsetX] = useState(0);
+
 
   const handleBookClick = () => {
     setShouldRenderMiddlePages(false);
@@ -213,6 +217,18 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
           />
         </mesh>
         <MultiplePages z_origin={0.075} z_directed={0.015}/>
+        <Text
+              font={winside}
+              rotation={[0, Math.PI, 0]}
+              position={[0, 0.6, 0]}
+              fontSize={0.1}
+              color="black"
+        >
+          Greetings Traveler🌟🦄
+        </Text>
+        <Image
+          url="./assets/images/DSC00060.JPG"
+        />
       </animated.group>
       </animated.group>
 

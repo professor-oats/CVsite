@@ -39,7 +39,7 @@ const MainApp = () => {
   const posMaxX = useRef(0);
   const lookMaxX = useRef(0);
   const posMaxY = useRef(0);
-  const lookMaxY = useRef(0);
+  // const lookMaxY = useRef(0);  // Not using this, we utilize the lookMaxX instead
   const posMaxZ = useRef(9);  // The initial camera.position.z
   const accelerationZ = useRef(0);
 
