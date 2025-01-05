@@ -17,6 +17,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
   const backCoverRef = useRef();
   const centerRef = useRef();
   const spineRef = useRef();
+  const profileImageRef = useRef();
   const callbackOpenTriggered = useRef(false);
   const callbackOpenedTriggered = useRef(false);
   const textures = useTextures();
@@ -28,6 +29,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
 
   // State for book opening
   const [isOpened, setIsOpened] = useState(false);
+  //const [isOpenedOpened, setIsOpenedOpened] = useState(false);
   const [shouldRenderMiddlePages, setShouldRenderMiddlePages] = useState(true);
 
   const [spineColor, setSpineColor] = useState('black'); // Initial color
@@ -219,7 +221,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
         <MultiplePages z_origin={0.075} z_directed={0.015}/>
         <Text
               font={winside}
-              rotation={[0, Math.PI, 0]}
+              rotation={[0, Math.PI, 0]} // For the ladies
               position={[0, 0.6, 0]}
               fontSize={0.1}
               color="black"
@@ -227,7 +229,11 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
           Greetings Traveler🌟🦄
         </Text>
         <Image
+          ref={profileImageRef}
           url="./assets/images/DSC00060.JPG"
+          rotation={[0, Math.PI, 0]}
+          position={[0, 0.2, 0.01]}
+          scale={[0.6, 0.6, 0.6]}
         />
       </animated.group>
       </animated.group>
@@ -264,7 +270,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
 
         {/* Outline Effects */}
         {frontCoverRef?.current && !isOpened && (
-          <OutlineEffect objectRef={frontCoverRef} color="red" time={time} scaleMultiplier={hoverBookScaleMultiplier} />
+          <OutlineEffect objectRef={frontCoverRef} color="red" offsetX={0.0} offsetY={-0.014} offsetZ={-0.1} time={time} scaleMultiplier={hoverBookScaleMultiplier} />
         )}
 
       </animated.group>

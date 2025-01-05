@@ -57,7 +57,7 @@ const fuzzyOutlineShader = {
 };
 
 // Increase the scaleMultiplier later on on hover
-const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.2, time }) => {
+const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.2, offsetX= 0.0, offsetY = 0.0, offsetZ = 0.0, time }) => {
   const materialRef = useRef();
 
 
@@ -85,7 +85,7 @@ const OutlineEffect = ({ objectRef, color = "red", scaleMultiplier = 1.2, time }
           scaleMultiplier
         ]}
         // We will need to offset the position.z to get mid pos
-        position={[objectRef.current.position.x, objectRef.current.position.y - 0.014, objectRef.current.position.z - 0.1]}
+        position={[objectRef.current.position.x + offsetX, objectRef.current.position.y + offsetY, objectRef.current.position.z + offsetZ]}
         rotation={objectRef.current.rotation}
         layers={objectRef.current.layers} // Ensure it follows the same layers (if used)
       >
