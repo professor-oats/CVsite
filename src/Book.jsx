@@ -219,6 +219,8 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
           />
         </mesh>
         <MultiplePages z_origin={0.075} z_directed={0.015}/>
+
+        {/* I would so much want to write a shader for some pixel manip on mouse hover here */}
         <Text
               font={winside}
               rotation={[0, Math.PI, 0]} // For the ladies
@@ -228,13 +230,38 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
         >
           Greetings Traveler🌟🦄
         </Text>
-        <Image
+        <Image  // WTF, is this hogging resources?? This and the text render I guess
           ref={profileImageRef}
           url="./assets/images/DSC00060.JPG"
           rotation={[0, Math.PI, 0]}
           position={[0, 0.2, 0.01]}
           scale={[0.6, 0.6, 0.6]}
         />
+        <Text
+          rotation={[0, Math.PI, 0]} // For the ladies
+          position={[-0.08, -0.22, 0]}
+          fontSize={0.04}
+          maxWidth={1}
+          color="black"
+        >" It would be a lie to say I have +6 solid years of
+          experience in computer studies...</Text>
+        <Text
+          rotation={[0, Math.PI, 0]} // For the ladies
+          position={[-0.08, -0.32, 0]}
+          fontSize={0.03}
+          maxWidth={1}
+          color="black"
+        >It would be a lie to say I didn't "
+        </Text>
+        <Text
+          rotation={[0, Math.PI, 0]} // For the ladies
+          position={[-0.06, -0.49, 0]}
+          fontSize={0.032}
+          maxWidth={1}
+          color="black"
+        >Frontend guy that enjoys pushing pixels and boundary boxes. Most experienced with
+          JS, TS and C++. Like C and OpenCL most. Guess the idea of creating own worlds and setting the rules and boundaries got me hooked.
+        </Text>
       </animated.group>
       </animated.group>
 
@@ -256,6 +283,25 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
           />
           <MultiplePages z_origin={0.115} z_directed={-0.015}/>
         </mesh>
+        <Text
+          font={winside}
+          rotation={[0, 0, 0]}
+          position={[0, 0.6, 0]}
+          fontSize={0.1}
+          color="black"
+        >
+          Fun Facts !
+        </Text>
+        <Text
+          rotation={[0, 0, 0]}
+          position={[-0.06, -0.49, 0]}
+          fontSize={0.032}
+          maxWidth={1}
+          color="black"
+        >
+          Currently rocking an
+        </Text>
+
       </animated.group>
 
         {/* spine */}
