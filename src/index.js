@@ -56,6 +56,11 @@ const MainApp = () => {
     }
   }, []);
 
+  const handleBloom = () => {
+    console.log("book is clicked")
+    setHaveBloom(false)
+  }
+
   const handleBookOpened = () => {
     console.log('Book is opened')
     setShowParticles(false);
@@ -82,7 +87,6 @@ const MainApp = () => {
 
     useFrame(() => {
       accelerationZ.current += 0.001;
-      console.log(posMaxZ.current);
       if (cameraRef.current && isOpened && posMaxZ.current >= 1.6) {
         posMaxZ.current = Math.max(1.6, posMaxZ.current - (0.03 + accelerationZ.current));
         cameraRef.current.position.z = posMaxZ.current;
@@ -216,6 +220,7 @@ const MainApp = () => {
               setFrontCoverRef={setFrontCoverRef}
               setBackCoverRef={setBackCoverRef}
               onBookOpened={handleBookOpened}
+              onBookClick={handleBloom}
             />
         </Canvas>
       </TextureProvider>

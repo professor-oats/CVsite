@@ -9,7 +9,7 @@ import {Text, Image} from '@react-three/drei';
 import winside from './assets/fonts/winsideuz.regular.ttf';
 
 // Any good book has references you know ...
-const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => {
+const Book = ({setFrontCoverRef, setBackCoverRef, onBookClick, onBookOpened}) => {
   const bookRef = useRef();
   const frontCoverGroupRef = useRef();
   const frontCoverRef = useRef();
@@ -38,11 +38,12 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
 
 
   const handleBookClick = () => {
+    onBookClick();
     setShouldRenderMiddlePages(false);
     setIsOpened(true); // Toggle the book open state
-    if (isOpened && onBookOpen && !callbackOpenTriggered.current) {
-      callbackOpenTriggered.current = true;
-      onBookOpen(); // Notify parent when book is clicked/about to open
+    if (isOpened && onBookClick && !callbackOpenTriggered.current) {
+      callbackOpenTriggered.current = true; // IS THIS EVEN UTILIZED CURRENTLY?? Lasagna
+      //onBookOpen(); // Notify parent when book is clicked/about to open
     }
   };
 
@@ -267,12 +268,18 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
       </animated.group>
 
         {/* Bulk of center pages, first thought to bring more animation base
-          * but opted out */}
+          * but opted out
+          */}
+        {/* Currently there is an overlap in the anim, so when running as this it looks good
+          * but the display of <Text> is delayed due to the overlap, but we will settle
+          */}
         <group ref={centerRef}>
           {shouldRenderMiddlePages && <MultiplePages amount={4} z_origin={0.06} z_directed={-0.015}/>}
         </group>
 
       {/* Back Cover */}
+        {/* The <Text> currently renders out of place and we could dig deep and fix this
+          * but I will settle with some anim hiccups due to the time constraint */}
       <animated.group ref={backCoverGroupRef} rotation-y={backCoverRotation}>
         <mesh ref={backCoverRef} position={[0, 0, -0.1]}>
           <boxGeometry args={[1.1, 1.5, 0.07]}/>
@@ -321,7 +328,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
         >
           AD-hacking - API Consumption - Backup Management/Safe Storage - CMake + Toolchaining - Dad Jokes - Docker - Git - Graphical/Frontended Programming
           - Network configuration: DNS, Firewalling, Routing, Static/Dynamic IPs - React + Node.js - Virtualisation techniques of Network and Machines, both pseudo (jailing) and full
-          - Unix, *nix and Windöws - Utility scripting in Python 😊
+          - Unix, *nix and Windows - Utility scripting in Python 😊
         </Text>
 
         <Text
