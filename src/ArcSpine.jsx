@@ -30,6 +30,8 @@ const ArcSpine = ({spineColor = 'black'}) => {
         normalMap={textures.normalLeather}
         diffuseMap={textures.diffuseLeather}
         roughness={0.6}
+        //emissive="#FFFFFF"
+        //emissiveIntensity={0.0}
       />
     </mesh>
   );

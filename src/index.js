@@ -170,7 +170,7 @@ const MainApp = () => {
         </button>
       </div> }
 
-      <TextureProvider>
+      <TextureProvider materials={['leather', 'snow']}>
         <Canvas
           style={{
             position: "absolute", // Ensure Canvas fills the container

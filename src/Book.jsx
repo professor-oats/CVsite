@@ -224,7 +224,7 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
         <Text
               font={winside}
               rotation={[0, Math.PI, 0]} // For the ladies
-              position={[0, 0.6, 0]}
+              position={[-0.0247, 0.6, 0]} // Importante mucho
               fontSize={0.1}
               color="black"
         >
@@ -255,12 +255,13 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
         </Text>
         <Text
           rotation={[0, Math.PI, 0]} // For the ladies
-          position={[-0.06, -0.49, 0]}
+          position={[-0.03, -0.49, 0]}
           fontSize={0.032}
-          maxWidth={1}
+          maxWidth={0.9}
           color="black"
-        >Frontend guy that enjoys pushing pixels and boundary boxes. Most experienced with
-          JS, TS and C++. Like C and OpenCL most. Guess the idea of creating own worlds and setting the rules and boundaries got me hooked.
+          lineHeight={1.3} // Optional, adjusts spacing between lines
+        >Frontend guy who enjoys pushing pixels and boundary boxes. Most experienced with
+          JS/TS, Python and C++. Like C and OpenCL most. Guess the idea of creating own worlds and setting the rules and behaviours got me hooked.
         </Text>
       </animated.group>
       </animated.group>
@@ -294,12 +295,45 @@ const Book = ({setFrontCoverRef, setBackCoverRef, onBookOpen, onBookOpened}) => 
         </Text>
         <Text
           rotation={[0, 0, 0]}
-          position={[-0.06, -0.49, 0]}
+          position={[-0.06, 0.186, 0]}
           fontSize={0.032}
-          maxWidth={1}
+          maxWidth={0.85}
           color="black"
+          lineHeight={1.6}
         >
-          Currently rocking an
+          ✅Currently rocking an HVE in Pentesting@ITHS_ST2024
+          -->  Had a habit of doing things "not supposed to", and now,
+          I am supposed to do things that are not supposed.
+          ✅Speaking of which, the pages you're reading are made of snow. See for yourself in the codebase.
+          ✅Wrote a Raytracer (Nvidia teched) in C++ together with a friend, wrote it again because of bad memory.
+          ✅The official national animal of Scotland is the Unicorn.
+          ✅Major backbone in Customers Service, I speak it fluently when in character and rate well on reviews. 🌟
+          ✅Will appreciate a job in Development (System or Software), IT-Security or Pentesting. Enough checkmarks - Let us use the
+          rest of the page for some skillmashing -
+        </Text>
+        <Text
+          rotation={[0, 0, 0]}
+          position={[-0.039, -0.367, 0]}
+          fontSize={0.032}
+          maxWidth={0.9}
+          color="black"
+          lineHeight={1.6}
+        >
+          AD-hacking - API Consumption - Backup Management/Safe Storage - CMake + Toolchaining - Dad Jokes - Docker - Git - Graphical/Frontended Programming
+          - Network configuration: DNS, Firewalling, Routing, Static/Dynamic IPs - React + Node.js - Virtualisation techniques of Network and Machines, both pseudo (jailing) and full
+          - Unix, *nix and Windöws - Utility scripting in Python 😊
+        </Text>
+
+        <Text
+          rotation={[0, 0, 0]}
+          position={[0.24, -0.626, 0]}
+          fontSize={0.032}
+          maxWidth={0.58}
+          color="black"
+          lineHeight={1.6}
+        >
+          See you in the next project !!!
+          professor-oats@github
         </Text>
 
       </animated.group>

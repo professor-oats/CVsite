@@ -1,4 +1,4 @@
-// Texture Context Loader for global use baby
+// Texture Context Loader for global use
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { TextureLoader } from 'three';
@@ -7,21 +7,33 @@ const TextureContext = createContext();
 
 export const useTextures = () => useContext(TextureContext);
 
-export const TextureProvider = ({ children }) => {
+export const TextureProvider = ({ children, materials = [] }) => {
   const [textures, setTextures] = useState({});
 
   useEffect(() => {
     const loader = new TextureLoader();
-    const normalLeather = loader.load('./materials/leather/PNG/fabric_leather_02_nor_gl_1k.png');
-    const roughnessLeather = loader.load('./materials/leather/PNG/fabric_leather_02_rough_1k.png');
-    const diffuseLeather = loader.load('./materials/leather/PNG/fabric_leather_02_diff_1k.png');
-    // Skipping displacement map. Sure it brings details but
-    // since it only renders noticeable details when the scale is too high for
-    // the object to remain intact and not being displaced, we skip.
-    //const displacementLeather = loader.load('./materials/leather/PNG/fabric_leather_02_disp_1k.png')
+    const loadedTextures = {};
 
-    setTextures({ normalLeather, roughnessLeather, diffuseLeather });
-  }, []);
+    const loadMaterialTextures = (materialName) => {
+      switch (materialName) {
+        case 'leather':
+          loadedTextures.normalLeather = loader.load('./materials/leather/PNG/fabric_leather_02_nor_gl_1k.png');
+          loadedTextures.roughnessLeather = loader.load('./materials/leather/PNG/fabric_leather_02_rough_1k.png');
+          loadedTextures.diffuseLeather = loader.load('./materials/leather/PNG/fabric_leather_02_diff_1k.png');
+          break;
+        case 'snow':
+          loadedTextures.normalSnow = loader.load('./materials/snow/PNG/snow_02_nor_gl_1k.png');
+          loadedTextures.roughnessSnow = loader.load('./materials/snow/PNG/snow_02_rough_1k.png');
+          loadedTextures.diffuseSnow = loader.load('./materials/snow/PNG/snow_02_diff_1k.png');
+          break;
+        default:
+          console.warn(`Material ${materialName} is not recognized.`);
+      }
+    };
+
+    materials.forEach(loadMaterialTextures);
+    setTextures(loadedTextures);
+  }, [materials]);
 
   return (
     <TextureContext.Provider value={textures}>
