@@ -18,7 +18,8 @@ separate components, it started to affect some performance when queueing up <br 
 React's handling of elements to THREE.js object updates. <br />
 <br />
 Note: This was noticed when I wanted the camera updates applied to fiber's Canvas through its <br />
-own component, and I switched back to have it directly referenced into/linked with Canvas <br /> 
+own component, and I switched back to have it directly referenced into/linked with Canvas <br />
+(POC!!?? *I can't hear you, my fans are too noisy* <br />
 <br />
 
 It could be far better, and easier, to just make a plain THREE.js Scene for the usual Canvas. <br />
