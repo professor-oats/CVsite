@@ -6,7 +6,7 @@ Found a post by poeti8 in how to handle property updates of uniforms in three.js
 Give him a visit:<br />
 https://github.com/poeti8
 
-## Back story on why a book
+## Backstory on why a book
 During the courses in pentest I named a FreeBSD host running on Macbook Pro to 'blackbook', and <br />
 since job applications coming up, and with the hopes that a React app would help showcasing skills *cough* <br />
 I thought - let's realise this blackbook. And here it is.
