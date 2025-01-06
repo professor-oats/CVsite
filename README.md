@@ -6,7 +6,7 @@ Found a post by poeti8 in how to handle property updates of uniforms in three.js
 Give him a visit:<br />
 https://github.com/poeti8
 
-## Back story on why a book
+## Backstory on why a book
 During the courses in pentest I named a FreeBSD host running on Macbook Pro to 'blackbook', and <br />
 since job applications coming up, and with the hopes that a React app would help showcasing skills *cough* <br />
 I thought - let's realise this blackbook. And here it is.
@@ -18,7 +18,8 @@ separate components, it started to affect some performance when queueing up <br 
 React's handling of elements to THREE.js object updates. <br />
 <br />
 Note: This was noticed when I wanted the camera updates applied to fiber's Canvas through its <br />
-own component, and I switched back to have it directly referenced into/linked with Canvas <br /> 
+own component, and I switched back to have it directly referenced into/linked with Canvas <br />
+(POC!!?? *I can't hear you, my fans are too noisy* <br />
 <br />
 
 It could be far better, and easier, to just make a plain THREE.js Scene for the usual Canvas. <br />
