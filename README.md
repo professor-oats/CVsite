@@ -30,3 +30,8 @@ Update 2025-01-05: <br />
 Looking back now things are coming together neatly with React as long as you manage <br />
 some hiccups here and there. I also just learnt, +40 hours in, how to correctly add emissiveness to materials, <br />
 no idea where my brain was at before. Will we even keep the added Bloom now? <br />
+
+## TODO
+* Fix a mobile version of the site<br />
+* Code framerate independent anims <br />
+* Most likely I will leave this site as a POC and invest time elsewhere<br />
